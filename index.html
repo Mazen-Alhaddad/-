@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0c0c1a">
 <title>لوحة العناصر</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -301,44 +303,44 @@ function cellRect(ci,ri){
    PRESET — baked-in from preset.json
 ══════════════════════════════════════ */
 const PRESET=[
-  {ci:2,ri:6,color:"#A8DFF4"},{ci:0,ri:0,color:"#A8DFF4"},
-  {ci:5,ri:12,color:"#B9DB8D"},{ci:1,ri:12,color:"#A8DFF4"},
-  {ci:2,ri:9,color:"#A8DFF4"},{ci:3,ri:3,color:"#A8DFF4"},
-  {ci:5,ri:0,color:"#A8DFF4"},{ci:4,ri:1,color:"#A8DFF4"},
-  {ci:2,ri:1,color:"#A8DFF4"},{ci:3,ri:4,color:"#A8DFF4"},
-  {ci:2,ri:3,color:"#A8DFF4"},{ci:1,ri:16,color:"#B9DB8D"},
-  {ci:1,ri:15,color:"#B9DB8D"},{ci:2,ri:5,color:"#A8DFF4"},
-  {ci:2,ri:12,color:"#A8DFF4"},{ci:6,ri:1,color:"#A8DFF4"},
-  {ci:4,ri:12,color:"#A8DFF4"},{ci:0,ri:1,color:"#A8DFF4"},
-  {ci:1,ri:4,color:"#A8DFF4"},{ci:3,ri:5,color:"#A8DFF4"},
-  {ci:4,ri:0,color:"#A8DFF4"},{ci:1,ri:7,color:"#A8DFF4"},
-  {ci:3,ri:8,color:"#A8DFF4"},{ci:1,ri:1,color:"#A8DFF4"},
-  {ci:1,ri:6,color:"#A8DFF4"},{ci:4,ri:13,color:"#B9DB8D"},
-  {ci:1,ri:2,color:"#A8DFF4"},{ci:3,ri:9,color:"#A8DFF4"},
-  {ci:3,ri:7,color:"#A8DFF4"},{ci:3,ri:0,color:"#A8DFF4"},
-  {ci:2,ri:10,color:"#A8DFF4"},{ci:3,ri:10,color:"#A8DFF4"},
-  {ci:2,ri:4,color:"#A8DFF4"},{ci:1,ri:8,color:"#A8DFF4"},
-  {ci:0,ri:2,color:"#A8DFF4"},{ci:2,ri:2,color:"#A8DFF4"},
-  {ci:3,ri:1,color:"#A8DFF4"},{ci:1,ri:11,color:"#A8DFF4"},
-  {ci:3,ri:11,color:"#A8DFF4"},{ci:3,ri:6,color:"#A8DFF4"},
-  {ci:1,ri:3,color:"#A8DFF4"},{ci:1,ri:9,color:"#A8DFF4"},
-  {ci:2,ri:7,color:"#A8DFF4"},{ci:2,ri:0,color:"#A8DFF4"},
-  {ci:2,ri:15,color:"#B9DB8D"},{ci:1,ri:0,color:"#A8DFF4"},
-  {ci:3,ri:13,color:"#B9DB8D"},{ci:6,ri:0,color:"#FDE11B"}, /* مربع الهيدروجين - معتم 100% */
-  {ci:2,ri:8,color:"#A8DFF4"},{ci:3,ri:12,color:"#A8DFF4"},
-  {ci:3,ri:2,color:"#A8DFF4"},{ci:3,ri:14,color:"#B9DB8D"},
-  {ci:2,ri:11,color:"#A8DFF4"},{ci:1,ri:10,color:"#A8DFF4"},
-  {ci:2,ri:14,color:"#B9DB8D"},{ci:1,ri:5,color:"#A8DFF4"},
-  {ci:5,ri:1,color:"#A8DFF4"},{ci:1,ri:13,color:"#A8DFF4"},
-  {ci:6,ri:17,color:"#FDE11B"},{ci:1,ri:14,color:"#A8DFF4"},
-  {ci:4,ri:14,color:"#FDE11B"},{ci:5,ri:15,color:"#FDE11B"},
-  {ci:5,ri:13,color:"#FDE11B"},{ci:2,ri:13,color:"#A8DFF4"},
-  {ci:5,ri:16,color:"#FDE11B"},{ci:5,ri:17,color:"#FDE11B"},
-  {ci:4,ri:15,color:"#FDE11B"},{ci:4,ri:16,color:"#FDE11B"},
-  {ci:5,ri:14,color:"#FDE11B"},{ci:4,ri:17,color:"#FDE11B"},
-  {ci:3,ri:17,color:"#FDE11B"},{ci:2,ri:16,color:"#FDE11B"},
-  {ci:2,ri:17,color:"#FDE11B"},{ci:1,ri:17,color:"#FDE11B"},
-  {ci:3,ri:16,color:"#FDE11B"},{ci:3,ri:15,color:"#FDE11B"}
+  {ci:2,ri:6,color:"#86D5F1"},{ci:0,ri:0,color:"#86D5F1"},
+  {ci:5,ri:12,color:"#9DD45B"},{ci:1,ri:12,color:"#86D5F1"},
+  {ci:2,ri:9,color:"#86D5F1"},{ci:3,ri:3,color:"#86D5F1"},
+  {ci:5,ri:0,color:"#86D5F1"},{ci:4,ri:1,color:"#86D5F1"},
+  {ci:2,ri:1,color:"#86D5F1"},{ci:3,ri:4,color:"#86D5F1"},
+  {ci:2,ri:3,color:"#86D5F1"},{ci:1,ri:16,color:"#9DD45B"},
+  {ci:1,ri:15,color:"#9DD45B"},{ci:2,ri:5,color:"#86D5F1"},
+  {ci:2,ri:12,color:"#86D5F1"},{ci:6,ri:1,color:"#86D5F1"},
+  {ci:4,ri:12,color:"#86D5F1"},{ci:0,ri:1,color:"#86D5F1"},
+  {ci:1,ri:4,color:"#86D5F1"},{ci:3,ri:5,color:"#86D5F1"},
+  {ci:4,ri:0,color:"#86D5F1"},{ci:1,ri:7,color:"#86D5F1"},
+  {ci:3,ri:8,color:"#86D5F1"},{ci:1,ri:1,color:"#86D5F1"},
+  {ci:1,ri:6,color:"#86D5F1"},{ci:4,ri:13,color:"#9DD45B"},
+  {ci:1,ri:2,color:"#86D5F1"},{ci:3,ri:9,color:"#86D5F1"},
+  {ci:3,ri:7,color:"#86D5F1"},{ci:3,ri:0,color:"#86D5F1"},
+  {ci:2,ri:10,color:"#86D5F1"},{ci:3,ri:10,color:"#86D5F1"},
+  {ci:2,ri:4,color:"#86D5F1"},{ci:1,ri:8,color:"#86D5F1"},
+  {ci:0,ri:2,color:"#86D5F1"},{ci:2,ri:2,color:"#86D5F1"},
+  {ci:3,ri:1,color:"#86D5F1"},{ci:1,ri:11,color:"#86D5F1"},
+  {ci:3,ri:11,color:"#86D5F1"},{ci:3,ri:6,color:"#86D5F1"},
+  {ci:1,ri:3,color:"#86D5F1"},{ci:1,ri:9,color:"#86D5F1"},
+  {ci:2,ri:7,color:"#86D5F1"},{ci:2,ri:0,color:"#86D5F1"},
+  {ci:2,ri:15,color:"#9DD45B"},{ci:1,ri:0,color:"#86D5F1"},
+  {ci:3,ri:13,color:"#9DD45B"},{ci:6,ri:0,color:"#EAD800"}, /* مربع الهيدروجين - معتم 100% */
+  {ci:2,ri:8,color:"#86D5F1"},{ci:3,ri:12,color:"#86D5F1"},
+  {ci:3,ri:2,color:"#86D5F1"},{ci:3,ri:14,color:"#9DD45B"},
+  {ci:2,ri:11,color:"#86D5F1"},{ci:1,ri:10,color:"#86D5F1"},
+  {ci:2,ri:14,color:"#9DD45B"},{ci:1,ri:5,color:"#86D5F1"},
+  {ci:5,ri:1,color:"#86D5F1"},{ci:1,ri:13,color:"#86D5F1"},
+  {ci:6,ri:17,color:"#EAD800"},{ci:1,ri:14,color:"#86D5F1"},
+  {ci:4,ri:14,color:"#EAD800"},{ci:5,ri:15,color:"#EAD800"},
+  {ci:5,ri:13,color:"#EAD800"},{ci:2,ri:13,color:"#86D5F1"},
+  {ci:5,ri:16,color:"#EAD800"},{ci:5,ri:17,color:"#EAD800"},
+  {ci:4,ri:15,color:"#EAD800"},{ci:4,ri:16,color:"#EAD800"},
+  {ci:5,ri:14,color:"#EAD800"},{ci:4,ri:17,color:"#EAD800"},
+  {ci:3,ri:17,color:"#EAD800"},{ci:2,ri:16,color:"#EAD800"},
+  {ci:2,ri:17,color:"#EAD800"},{ci:1,ri:17,color:"#EAD800"},
+  {ci:3,ri:16,color:"#EAD800"},{ci:3,ri:15,color:"#EAD800"}
 ].filter(p=>VALID_CELLS.has(`${p.ci},${p.ri}`)); // filter removes ci=6,ri=1
 
 /* ══════════════════════════════════════
@@ -770,6 +772,17 @@ function bindEvents(){
   document.addEventListener('mouseup',onPanEnd);
 }
 
+/* ══════════════════════════════════════
+   PWA - SERVICE WORKER REGISTRATION
+══════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ تم تسجيل Service Worker بنجاح:', reg.scope))
+      .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
+  });
+}
+
 init();
 </script>
 </body>
@@ -1069,6 +1082,17 @@ function bindEvents(){
   workspace.addEventListener('wheel',onWheel,{passive:false});
 }
 
+/* ══════════════════════════════════════
+   PWA - SERVICE WORKER REGISTRATION
+══════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ تم تسجيل Service Worker بنجاح:', reg.scope))
+      .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
+  });
+}
+
 init();
 </script>
 </body>
@@ -1093,6 +1117,17 @@ berEnd();endPan();
 
   // Zoom wheel (only zoom-in)
   workspace.addEventListener('wheel',onWheel,{passive:false});
+}
+
+/* ══════════════════════════════════════
+   PWA - SERVICE WORKER REGISTRATION
+══════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ تم تسجيل Service Worker بنجاح:', reg.scope))
+      .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
+  });
 }
 
 init();
