@@ -1,222 +1,261 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<link rel="manifest" href="manifest.json">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0c0c1a">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon.png">
 <title>الجدول الدوري</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 /* ══ RESET ══ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;touch-action:none}
-body{font-family:'Cairo',sans-serif;background:#000;user-select:none;height:100dvh;}
+body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:100dvh;}
 
 /* ══ WORKSPACE ══ */
-#workspace{position:fixed;inset:0;overflow:hidden;background:#0d0d0d;touch-action:none;}
+#workspace{
+  position:fixed;inset:0;overflow:hidden;
+  background:#0c0c1a;touch-action:none;
+}
 
 /* ══ BOARD ══ */
-#board{position:absolute;background:transparent;transform-origin:0 0;overflow:visible;}
-
-/* ══ GRID CANVAS (hidden by default — only for bg image alignment) ══ */
-#grid-canvas{position:absolute;inset:0;pointer-events:none;z-index:1;display:none;}
+#board{
+  position:absolute;
+  background:transparent;
+  transform-origin:0 0;
+  overflow:visible;
+}
 
 /* ══ SQUARES ══ */
 .sq{
   position:absolute;z-index:10;
-  border:1px solid rgba(0,0,0,0.55);
+  border:1px solid rgba(0,0,0,0.5);
   border-radius:0;
   cursor:pointer;
-  transition:opacity .25s ease, transform .15s ease;
-  opacity:1; /* معتم 100% */
+  transition:opacity .22s ease, transform .12s ease;
+  opacity:1;
 }
-.sq:hover{opacity:0.85;transform:scale(1.03);}
-.sq.hidden{opacity:0 !important;} /* pointer-events kept ON so user can re-cover */
+.sq:active{transform:scale(0.97);}
+/* revealed = transparent, but still clickable */
+.sq.revealed{opacity:0;}
 
-/* ══ FLOATING SETTINGS BUTTON ══ */
+/* ══ SETTINGS BUTTON ══ */
 #menu-btn{
   position:fixed;top:14px;right:14px;z-index:1000;
-  width:44px;height:44px;border-radius:12px;
-  background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.18);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  color:#fff;font-size:20px;cursor:pointer;
+  width:46px;height:46px;border-radius:14px;
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  color:#fff;font-size:21px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:background .2s,transform .15s;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
 }
 #menu-btn:hover{background:rgba(0,0,0,.75);}
-#menu-btn.open{transform:rotate(45deg);background:rgba(20,20,50,.85);}
+#menu-btn.open{transform:rotate(45deg);background:rgba(10,10,40,.9);}
 
 /* ══ SETTINGS DRAWER ══ */
 #menu-drawer{
-  position:fixed;top:66px;right:14px;z-index:999;
-  width:260px;border-radius:14px;
-  background:rgba(10,10,26,.97);border:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  padding:12px;display:none;flex-direction:column;gap:8px;
-  box-shadow:0 12px 40px rgba(0,0,0,.7);
+  position:fixed;top:68px;right:14px;z-index:999;
+  width:265px;border-radius:16px;
+  background:rgba(8,8,22,.97);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  padding:12px 10px;
+  display:none;flex-direction:column;gap:4px;
+  box-shadow:0 16px 48px rgba(0,0,0,.75);
 }
 #menu-drawer.open{display:flex;}
-.m-section{display:flex;flex-direction:column;gap:5px;padding:6px 0;
-  border-bottom:1px solid rgba(255,255,255,.07);}
-.m-section:last-child{border-bottom:none;}
-.m-label{font-size:9px;font-weight:700;letter-spacing:.09em;
-  color:rgba(255,255,255,.3);text-transform:uppercase;padding:0 2px 2px;}
+
+.m-section{
+  display:flex;flex-direction:column;gap:4px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.m-section:last-child{border-bottom:none;padding-bottom:2px;}
+.m-label{
+  font-size:9px;font-weight:700;letter-spacing:.1em;
+  color:rgba(255,255,255,.28);text-transform:uppercase;
+  padding:0 4px 4px;
+}
 .m-btn{
-  height:36px;width:100%;border-radius:8px;border:none;
+  height:38px;width:100%;border-radius:9px;border:none;
   background:rgba(255,255,255,.06);color:#edeefa;
   font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;
-  cursor:pointer;display:flex;align-items:center;gap:8px;padding:0 10px;
-  transition:background .15s;
+  cursor:pointer;display:flex;align-items:center;gap:8px;
+  padding:0 12px;transition:background .15s;
 }
-.m-btn:hover{background:rgba(255,255,255,.14);}
-.m-btn span.ic{flex-shrink:0;width:18px;text-align:center;}
+.m-btn:hover{background:rgba(255,255,255,.13);}
+.m-btn:active{background:rgba(255,255,255,.18);}
+.m-btn .ic{flex-shrink:0;font-size:15px;}
+
+/* action buttons */
+.m-btn.reveal{background:rgba(0,212,255,.1);color:#00d4ff;}
+.m-btn.reveal:hover{background:rgba(0,212,255,.2);}
+.m-btn.cover{background:rgba(255,180,0,.08);color:#ffd060;}
+.m-btn.cover:hover{background:rgba(255,180,0,.18);}
+.m-btn.import-btn{background:rgba(0,212,255,.08);color:#00d4ff;
+  border:1px dashed rgba(0,212,255,.35);}
+.m-btn.import-btn:hover{background:rgba(0,212,255,.18);}
 
 /* ── SWITCH ROW ── */
-.switch-row{
+.sw-row{
   display:flex;align-items:center;justify-content:space-between;
-  padding:6px 2px;
+  padding:5px 4px;
 }
-.switch-row span{font-size:13px;color:#edeefa;font-weight:600;}
-/* Toggle switch */
-.sw{position:relative;width:44px;height:24px;flex-shrink:0;}
+.sw-row span{font-size:13px;color:#ccd;font-weight:600;}
+.sw{position:relative;width:46px;height:26px;flex-shrink:0;}
 .sw input{opacity:0;width:0;height:0;position:absolute;}
 .sw-track{
-  position:absolute;inset:0;border-radius:12px;
+  position:absolute;inset:0;border-radius:13px;
   background:rgba(255,255,255,.15);
-  transition:background .2s;cursor:pointer;
+  transition:background .22s;cursor:pointer;
 }
 .sw input:checked+.sw-track{background:#00d4ff;}
 .sw-track::after{
-  content:'';position:absolute;top:3px;left:3px;
+  content:'';position:absolute;top:4px;left:4px;
   width:18px;height:18px;border-radius:50%;
-  background:#fff;transition:transform .2s;
-  box-shadow:0 1px 4px rgba(0,0,0,.4);
+  background:#fff;transition:transform .22s;
+  box-shadow:0 1px 5px rgba(0,0,0,.35);
 }
 .sw input:checked+.sw-track::after{transform:translateX(20px);}
 
-/* ── FILE IMPORT ── */
-.file-btn{
-  height:34px;width:100%;border-radius:8px;
-  background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);
-  color:#00d4ff;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+/* ── IMPORT STATUS ── */
+#import-status{
+  font-size:10px;color:rgba(0,212,255,.6);
+  padding:2px 4px;display:none;
 }
-.file-btn:hover{background:rgba(0,212,255,.22);}
 
-/* ══ POPUP / INFO MODAL ══ */
-#popup-overlay{
+/* ══ POPUP ══ */
+#pop-overlay{
   position:fixed;inset:0;z-index:2000;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(6px);
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   display:none;align-items:center;justify-content:center;
-  padding:20px;
+  padding:16px;
 }
-#popup-overlay.open{display:flex;}
-#popup-box{
-  position:relative;width:100%;max-width:380px;
-  background:rgba(12,12,30,.98);border:1px solid rgba(255,255,255,.14);
-  border-radius:18px;overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,.8);
-  display:flex;flex-direction:column;max-height:85vh;
+#pop-overlay.open{display:flex;}
+
+#pop-box{
+  position:relative;width:100%;max-width:390px;
+  background:rgba(10,10,28,.98);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:20px;overflow:hidden;
+  display:flex;flex-direction:column;
+  max-height:88vh;
+  box-shadow:0 24px 64px rgba(0,0,0,.85);
 }
-#popup-close{
+
+#pop-close{
   position:absolute;top:10px;left:10px;z-index:10;
-  width:30px;height:30px;border-radius:50%;
+  width:32px;height:32px;border-radius:50%;
   background:rgba(255,255,255,.12);border:none;
-  color:#fff;font-size:16px;cursor:pointer;
+  color:#fff;font-size:15px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:background .15s;
 }
-#popup-close:hover{background:rgba(255,59,48,.5);}
-/* Image area */
-#popup-img-wrap{
-  width:100%;aspect-ratio:4/3;background:#111;flex-shrink:0;overflow:hidden;
+#pop-close:hover{background:rgba(255,59,48,.5);}
+
+#pop-img-wrap{
+  width:100%;aspect-ratio:4/3;
+  background:#0a0a18;flex-shrink:0;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
 }
-#popup-img{width:100%;height:100%;object-fit:contain;display:none;}
-#popup-img-placeholder{
-  font-size:40px;opacity:.18;
+#pop-img{width:100%;height:100%;object-fit:contain;display:none;}
+#pop-img-ph{font-size:48px;opacity:.18;}
+
+#pop-info{
+  flex:1;overflow-y:auto;padding:18px 18px 22px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.12) transparent;
 }
-/* Info area */
-#popup-info{
-  flex:1;overflow-y:auto;padding:16px 16px 20px;
-  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;
+#pop-info::-webkit-scrollbar{width:3px;}
+#pop-info::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.14);border-radius:2px;
 }
-#popup-info::-webkit-scrollbar{width:4px;}
-#popup-info::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px;}
-#popup-title{
-  font-size:16px;font-weight:700;color:#edeefa;margin-bottom:10px;line-height:1.4;
+
+#pop-title{
+  font-size:17px;font-weight:800;color:#edeefa;
+  margin-bottom:10px;line-height:1.4;
 }
-#popup-body{
-  font-size:13px;color:rgba(255,255,255,.65);line-height:1.8;white-space:pre-wrap;
+#pop-body{
+  font-size:13px;color:rgba(255,255,255,.62);
+  line-height:1.85;white-space:pre-wrap;
 }
-#popup-no-data{
-  font-size:13px;color:rgba(255,255,255,.3);text-align:center;
-  padding:20px 0;display:none;
+#pop-nodata{
+  font-size:13px;color:rgba(255,255,255,.25);
+  text-align:center;padding:24px 0;display:none;
 }
 
 /* ══ ZOOM INDICATOR ══ */
 #zoom-ind{
-  position:fixed;bottom:10px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.75);color:rgba(255,255,255,.6);
-  padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;
-  pointer-events:none;z-index:900;opacity:0;transition:opacity .4s;
+  position:fixed;bottom:12px;left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,.78);color:rgba(255,255,255,.62);
+  padding:3px 14px;border-radius:20px;
+  font-size:11px;font-weight:600;letter-spacing:.04em;
+  pointer-events:none;z-index:900;
+  opacity:0;transition:opacity .4s;
 }
 #zoom-ind.show{opacity:1;}
 
 /* ══ TOAST ══ */
 .toast{
-  position:fixed;bottom:22px;left:50%;
+  position:fixed;bottom:24px;left:50%;
   transform:translateX(-50%) translateY(10px);
-  background:rgba(12,12,28,.97);border:1px solid rgba(255,255,255,.1);
-  color:#edeefa;padding:8px 20px;border-radius:10px;
+  background:rgba(10,10,28,.97);border:1px solid rgba(255,255,255,.1);
+  color:#edeefa;padding:9px 22px;border-radius:12px;
   font-size:13px;font-weight:600;z-index:9999;
   opacity:0;transition:opacity .22s,transform .28s cubic-bezier(.34,1.56,.64,1);
   backdrop-filter:blur(20px);pointer-events:none;
+  white-space:nowrap;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 
+<!-- WORKSPACE -->
 <div id="workspace">
-  <div id="board" dir="ltr">
-    <canvas id="grid-canvas"></canvas>
-  </div>
+  <div id="board" dir="ltr"></div>
 </div>
 
+<!-- ZOOM INDICATOR -->
 <div id="zoom-ind">100%</div>
 
+<!-- SETTINGS BUTTON -->
 <button id="menu-btn" title="الإعدادات">⚙</button>
 
+<!-- SETTINGS DRAWER -->
 <div id="menu-drawer">
 
+  <!-- Cover / Reveal -->
   <div class="m-section">
     <div class="m-label">التغطية والكشف</div>
-    <button class="m-btn" id="btn-reveal-all">
-      <span class="ic">👁</span>كشف جميع المربعات
+    <button class="m-btn reveal" id="btn-reveal">
+      <span class="ic">👁</span> كشف جميع المربعات
     </button>
-    <button class="m-btn" id="btn-cover-all">
-      <span class="ic">🫣</span>تغطية جميع المربعات
+    <button class="m-btn cover" id="btn-cover">
+      <span class="ic">🫣</span> تغطية جميع المربعات
     </button>
   </div>
 
+  <!-- Options -->
   <div class="m-section">
-    <div class="m-label">الخيارات العامة</div>
-    
-    <div class="switch-row">
-      <span>تثبيت الشاشة (منع التحريك)</span>
+    <div class="m-label">الخيارات</div>
+    <div class="sw-row">
+      <span>تثبيت الشاشة (قفل التحريك)</span>
       <label class="sw">
         <input type="checkbox" id="sw-lock">
         <div class="sw-track"></div>
       </label>
     </div>
-
-    <div class="switch-row">
-      <span>إظهار معلومات عند الضغط</span>
+    <div class="sw-row">
+      <span>نافذة المعلومات عند الكشف</span>
       <label class="sw">
         <input type="checkbox" id="sw-popup" checked>
         <div class="sw-track"></div>
@@ -224,42 +263,45 @@ body{font-family:'Cairo',sans-serif;background:#000;user-select:none;height:100d
     </div>
   </div>
 
+  <!-- Data import -->
   <div class="m-section">
-    <div class="m-label">استيراد بيانات المعلومات</div>
-    <button class="file-btn" id="btn-import-data">
-      <span>📂</span> استيراد ملف JSON
+    <div class="m-label">بيانات المعلومات</div>
+    <button class="m-btn import-btn" id="btn-import">
+      <span class="ic">📂</span> استيراد ملف JSON
     </button>
     <input type="file" id="import-file" accept=".json,application/json" hidden>
-    <div id="import-status" style="font-size:11px;color:rgba(255,255,255,.35);padding:2px 2px 0;display:none;"></div>
+    <div id="import-status"></div>
   </div>
 
+  <!-- View -->
   <div class="m-section">
-    <div class="m-label">الخلفية والعرض</div>
+    <div class="m-label">العرض</div>
     <button class="m-btn" id="btn-bg">
-      <span class="ic">🖼</span>تحميل صورة خلفية
+      <span class="ic">🖼</span> تحميل صورة خلفية
     </button>
     <input type="file" id="bg-file" accept="image/*" hidden>
     <button class="m-btn" id="btn-rotate">
-      <span class="ic">⟳</span>تدوير 270°
+      <span class="ic">⟳</span> تدوير الشاشة 270°
     </button>
-    <button class="m-btn" id="btn-reset-zoom">
-      <span class="ic">⊡</span>إعادة الحجم الطبيعي
+    <button class="m-btn" id="btn-center">
+      <span class="ic">⊡</span> توسيط وإعادة الحجم
     </button>
   </div>
 
 </div>
 
-<div id="popup-overlay">
-  <div id="popup-box">
-    <button id="popup-close">✕</button>
-    <div id="popup-img-wrap">
-      <img id="popup-img" alt="">
-      <div id="popup-img-placeholder">🔬</div>
+<!-- INFO POPUP -->
+<div id="pop-overlay">
+  <div id="pop-box">
+    <button id="pop-close">✕</button>
+    <div id="pop-img-wrap">
+      <img id="pop-img" alt="">
+      <div id="pop-img-ph">🔬</div>
     </div>
-    <div id="popup-info">
-      <div id="popup-title"></div>
-      <div id="popup-body"></div>
-      <div id="popup-no-data">لا توجد بيانات لهذا المربع</div>
+    <div id="pop-info">
+      <div id="pop-title"></div>
+      <div id="pop-body"></div>
+      <div id="pop-nodata">لا توجد بيانات لهذا المربع</div>
     </div>
   </div>
 </div>
@@ -269,7 +311,7 @@ body{font-family:'Cairo',sans-serif;background:#000;user-select:none;height:100d
 
 /* ══════════════════════════════════════
    GRID — from My_drawing.xml (VP 240×344)
-   Cell ci=6,ri=1 REMOVED (مربع زائد بجانب H)
+   ci=6,ri=1 removed (extra square beside H)
 ══════════════════════════════════════ */
 const VP_W=240, VP_H=344;
 const COL_XS=[68.10,86.41,105.26,123.93,142.43,160.87,179.39,197.18];
@@ -281,27 +323,16 @@ const VALID_CELLS=new Set();
   function a(c0,c1,r0,r1){
     for(let c=c0;c<=c1;c++)
       for(let r=r0;r<=r1;r++){
-        // Remove ci=6,ri=1 (the extra square next to Hydrogen)
-        if(c===6&&r===1) continue;
+        if(c===6&&r===1) continue; // remove extra cell
         VALID_CELLS.add(`${c},${r}`);
       }
   }
   a(0,6,0,1); a(0,3,2,2); a(1,3,3,3); a(1,3,4,11); a(1,5,12,16); a(1,6,17,17);
 })();
 
-function vx(v,bW){return(v/VP_W)*bW;}
-function vy(v,bH){return(v/VP_H)*bH;}
-function cellRect(ci,ri){
-  const bW=board.clientWidth,bH=board.clientHeight;
-  return{
-    x:vx(COL_XS[ci],bW), y:vy(ROW_YS[ri],bH),
-    w:vx(COL_XS[ci+1]-COL_XS[ci],bW),
-    h:vy(ROW_YS[ri+1]-ROW_YS[ri],bH)
-  };
-}
-
 /* ══════════════════════════════════════
-   PRESET — baked-in from preset.json
+   PRESET COLORS (from preset.json)
+   Hydrogen ci=6,ri=0 → yellow #EAD800
 ══════════════════════════════════════ */
 const PRESET=[
   {ci:2,ri:6,color:"#86D5F1"},{ci:0,ri:0,color:"#86D5F1"},
@@ -311,23 +342,23 @@ const PRESET=[
   {ci:2,ri:1,color:"#86D5F1"},{ci:3,ri:4,color:"#86D5F1"},
   {ci:2,ri:3,color:"#86D5F1"},{ci:1,ri:16,color:"#9DD45B"},
   {ci:1,ri:15,color:"#9DD45B"},{ci:2,ri:5,color:"#86D5F1"},
-  {ci:2,ri:12,color:"#86D5F1"},{ci:6,ri:1,color:"#86D5F1"},
-  {ci:4,ri:12,color:"#86D5F1"},{ci:0,ri:1,color:"#86D5F1"},
-  {ci:1,ri:4,color:"#86D5F1"},{ci:3,ri:5,color:"#86D5F1"},
-  {ci:4,ri:0,color:"#86D5F1"},{ci:1,ri:7,color:"#86D5F1"},
-  {ci:3,ri:8,color:"#86D5F1"},{ci:1,ri:1,color:"#86D5F1"},
-  {ci:1,ri:6,color:"#86D5F1"},{ci:4,ri:13,color:"#9DD45B"},
-  {ci:1,ri:2,color:"#86D5F1"},{ci:3,ri:9,color:"#86D5F1"},
-  {ci:3,ri:7,color:"#86D5F1"},{ci:3,ri:0,color:"#86D5F1"},
-  {ci:2,ri:10,color:"#86D5F1"},{ci:3,ri:10,color:"#86D5F1"},
-  {ci:2,ri:4,color:"#86D5F1"},{ci:1,ri:8,color:"#86D5F1"},
-  {ci:0,ri:2,color:"#86D5F1"},{ci:2,ri:2,color:"#86D5F1"},
-  {ci:3,ri:1,color:"#86D5F1"},{ci:1,ri:11,color:"#86D5F1"},
-  {ci:3,ri:11,color:"#86D5F1"},{ci:3,ri:6,color:"#86D5F1"},
-  {ci:1,ri:3,color:"#86D5F1"},{ci:1,ri:9,color:"#86D5F1"},
-  {ci:2,ri:7,color:"#86D5F1"},{ci:2,ri:0,color:"#86D5F1"},
-  {ci:2,ri:15,color:"#9DD45B"},{ci:1,ri:0,color:"#86D5F1"},
-  {ci:3,ri:13,color:"#9DD45B"},{ci:6,ri:0,color:"#EAD800"}, /* مربع الهيدروجين - معتم 100% */
+  {ci:2,ri:12,color:"#86D5F1"},{ci:4,ri:12,color:"#86D5F1"},
+  {ci:0,ri:1,color:"#86D5F1"},{ci:1,ri:4,color:"#86D5F1"},
+  {ci:3,ri:5,color:"#86D5F1"},{ci:4,ri:0,color:"#86D5F1"},
+  {ci:1,ri:7,color:"#86D5F1"},{ci:3,ri:8,color:"#86D5F1"},
+  {ci:1,ri:1,color:"#86D5F1"},{ci:1,ri:6,color:"#86D5F1"},
+  {ci:4,ri:13,color:"#9DD45B"},{ci:1,ri:2,color:"#86D5F1"},
+  {ci:3,ri:9,color:"#86D5F1"},{ci:3,ri:7,color:"#86D5F1"},
+  {ci:3,ri:0,color:"#86D5F1"},{ci:2,ri:10,color:"#86D5F1"},
+  {ci:3,ri:10,color:"#86D5F1"},{ci:2,ri:4,color:"#86D5F1"},
+  {ci:1,ri:8,color:"#86D5F1"},{ci:0,ri:2,color:"#86D5F1"},
+  {ci:2,ri:2,color:"#86D5F1"},{ci:3,ri:1,color:"#86D5F1"},
+  {ci:1,ri:11,color:"#86D5F1"},{ci:3,ri:11,color:"#86D5F1"},
+  {ci:3,ri:6,color:"#86D5F1"},{ci:1,ri:3,color:"#86D5F1"},
+  {ci:1,ri:9,color:"#86D5F1"},{ci:2,ri:7,color:"#86D5F1"},
+  {ci:2,ri:0,color:"#86D5F1"},{ci:2,ri:15,color:"#9DD45B"},
+  {ci:1,ri:0,color:"#86D5F1"},{ci:3,ri:13,color:"#9DD45B"},
+  {ci:6,ri:0,color:"#EAD800"},/* Hydrogen — yellow */
   {ci:2,ri:8,color:"#86D5F1"},{ci:3,ri:12,color:"#86D5F1"},
   {ci:3,ri:2,color:"#86D5F1"},{ci:3,ri:14,color:"#9DD45B"},
   {ci:2,ri:11,color:"#86D5F1"},{ci:1,ri:10,color:"#86D5F1"},
@@ -342,7 +373,7 @@ const PRESET=[
   {ci:3,ri:17,color:"#EAD800"},{ci:2,ri:16,color:"#EAD800"},
   {ci:2,ri:17,color:"#EAD800"},{ci:1,ri:17,color:"#EAD800"},
   {ci:3,ri:16,color:"#EAD800"},{ci:3,ri:15,color:"#EAD800"}
-].filter(p=>VALID_CELLS.has(`${p.ci},${p.ri}`)); // filter removes ci=6,ri=1
+].filter(p=>VALID_CELLS.has(`${p.ci},${p.ri}`));
 
 /* ══════════════════════════════════════
    STATE
@@ -350,12 +381,9 @@ const PRESET=[
 let S={
   rotDeg:0,
   bgDataUrl:null, bgW:null, bgH:null,
-  // squares: derived from PRESET, each has {ci,ri,color,visible:true}
-  squares: PRESET.map((p,i)=>({id:String(i),ci:p.ci,ri:p.ri,color:p.color,visible:false})),
-  // info data imported by user: Map<"ci,ri" -> {title,body,imgUrl}>
-  infoData: {},
-  popupEnabled: true,
-  screenLocked: false, // ميزة تثبيت الشاشة
+  squares: PRESET.map((p,i)=>({id:String(i),ci:p.ci,ri:p.ri,color:p.color,revealed:false})),
+  infoData:{},
+  locked:false,
 };
 
 /* ══════════════════════════════════════
@@ -366,45 +394,52 @@ let natW=0,natH=0,fitSc=1;
 const MAX_SC=8;
 
 /* ══════════════════════════════════════
-   DOM
+   DOM REFS
 ══════════════════════════════════════ */
-const workspace  =document.getElementById('workspace');
-const board      =document.getElementById('board');
-const gridCanvas =document.getElementById('grid-canvas');
-const menuBtn    =document.getElementById('menu-btn');
-const menuDrawer =document.getElementById('menu-drawer');
-const swPopup    =document.getElementById('sw-popup');
-const swLock     =document.getElementById('sw-lock'); // مفتاح قفل الشاشة
-const btnReveal  =document.getElementById('btn-reveal-all');
-const btnCover   =document.getElementById('btn-cover-all');
-const btnImport  =document.getElementById('btn-import-data');
-const importFile =document.getElementById('import-file');
-const importSt   =document.getElementById('import-status');
-const btnBg      =document.getElementById('btn-bg');
-const bgFile     =document.getElementById('bg-file');
-const btnRotate  =document.getElementById('btn-rotate');
-const btnRstZoom =document.getElementById('btn-reset-zoom');
-const popOverlay =document.getElementById('popup-overlay');
-const popClose   =document.getElementById('popup-close');
-const popImg     =document.getElementById('popup-img');
-const popImgPh   =document.getElementById('popup-img-placeholder');
-const popTitle   =document.getElementById('popup-title');
-const popBody    =document.getElementById('popup-body');
-const popNoData  =document.getElementById('popup-no-data');
-const zoomInd    =document.getElementById('zoom-ind');
+const workspace =document.getElementById('workspace');
+const board     =document.getElementById('board');
+const menuBtn   =document.getElementById('menu-btn');
+const menuDrawer=document.getElementById('menu-drawer');
+const swLock    =document.getElementById('sw-lock');
+const swPopup   =document.getElementById('sw-popup');
+const btnReveal =document.getElementById('btn-reveal');
+const btnCover  =document.getElementById('btn-cover');
+const btnImport =document.getElementById('btn-import');
+const importFile=document.getElementById('import-file');
+const importSt  =document.getElementById('import-status');
+const btnBg     =document.getElementById('btn-bg');
+const bgFile    =document.getElementById('bg-file');
+const btnRotate =document.getElementById('btn-rotate');
+const btnCenter =document.getElementById('btn-center');
+const popOverlay=document.getElementById('pop-overlay');
+const popClose  =document.getElementById('pop-close');
+const popImg    =document.getElementById('pop-img');
+const popImgPh  =document.getElementById('pop-img-ph');
+const popTitle  =document.getElementById('pop-title');
+const popBody   =document.getElementById('pop-body');
+const popNodata =document.getElementById('pop-nodata');
+const zoomInd   =document.getElementById('zoom-ind');
 
 /* ══════════════════════════════════════
-   INIT
+   GRID HELPERS
 ══════════════════════════════════════ */
-function init(){
-  fitBoard();
-  renderSquares();
-  bindEvents();
-  window.addEventListener('resize',()=>{fitBoard();renderSquares();});
+function vx(v,bW){return(v/VP_W)*bW;}
+function vy(v,bH){return(v/VP_H)*bH;}
+function cellRect(ci,ri){
+  const bW=board.clientWidth, bH=board.clientHeight;
+  return{
+    x:vx(COL_XS[ci],bW), y:vy(ROW_YS[ri],bH),
+    w:vx(COL_XS[ci+1]-COL_XS[ci],bW),
+    h:vy(ROW_YS[ri+1]-ROW_YS[ri],bH)
+  };
 }
 
 /* ══════════════════════════════════════
-   BOARD SIZING
+   BOARD SIZING & TRANSFORM
+   CSS order: translate → scale → rotate
+   For rotate(270°):
+     displayed bbox = natH × natW
+     T.ty += natW*scale  (compensates negative-y shift)
 ══════════════════════════════════════ */
 function fitBoard(){
   const wW=workspace.clientWidth, wH=workspace.clientHeight;
@@ -421,18 +456,15 @@ function fitBoard(){
   centerTransform();
 }
 
-/* ══════════════════════════════════════
-   TRANSFORM MATH
-══════════════════════════════════════ */
 function centerTransform(){
   const wW=workspace.clientWidth, wH=workspace.clientHeight;
   T.rot=S.rotDeg;
-  const rot=T.rot;
-  const dispW=(rot===90||rot===270)?natH:natW;
-  const dispH=(rot===90||rot===270)?natW:natH;
+  const is270=(T.rot===270);
+  const dispW=is270?natH:natW;
+  const dispH=is270?natW:natH;
   fitSc=Math.min(wW/dispW, wH/dispH);
   T.scale=fitSc;
-  if(rot===270){
+  if(is270){
     T.tx=(wW-natH*T.scale)/2;
     T.ty=(wH-natW*T.scale)/2 + natW*T.scale;
   } else {
@@ -466,42 +498,42 @@ function showZoom(){
   zoomInd.textContent=Math.round(T.scale*100)+'%';
   zoomInd.classList.add('show');
   clearTimeout(zoomInd._t);
-  zoomInd._t=setTimeout(()=>zoomInd.classList.remove('show'),1200);
+  zoomInd._t=setTimeout(()=>zoomInd.classList.remove('show'),1100);
 }
 
 /* ══════════════════════════════════════
    RENDER SQUARES
+   revealed=false → square SHOWS (covered)
+   revealed=true  → square HIDDEN (uncovered, shows bg)
 ══════════════════════════════════════ */
 function renderSquares(){
   document.querySelectorAll('.sq').forEach(el=>el.remove());
   S.squares.forEach(sq=>{
     const{x,y,w,h}=cellRect(sq.ci,sq.ri);
     const el=document.createElement('div');
-    el.className='sq'+(sq.visible?' hidden':''); 
-    el.dataset.ci=sq.ci; el.dataset.ri=sq.ri;
-    el.style.cssText=`left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${sq.color};`;
+    el.className='sq'+(sq.revealed?' revealed':'');
+    el.style.cssText=
+      `left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${sq.color};`;
     el.addEventListener('click',()=>onSquareClick(sq,el));
     board.appendChild(el);
   });
 }
 
 /* ══════════════════════════════════════
-   SQUARE CLICK
+   SQUARE CLICK — toggle cover/reveal
 ══════════════════════════════════════ */
 function onSquareClick(sq,el){
-  const popMode = swPopup.checked;
-  sq.visible = !sq.visible;
-  el.classList.toggle('hidden', sq.visible);
-  if(popMode && sq.visible) showPopup(sq);
+  sq.revealed=!sq.revealed;
+  el.classList.toggle('revealed', sq.revealed);
+  // Show popup when revealing (uncovering)
+  if(sq.revealed && swPopup.checked) showPopup(sq);
 }
 
 /* ══════════════════════════════════════
    POPUP
 ══════════════════════════════════════ */
 function showPopup(sq){
-  const key=`${sq.ci},${sq.ri}`;
-  const data=S.infoData[key];
-
+  const data=S.infoData[`${sq.ci},${sq.ri}`];
   if(data && data.imgUrl){
     popImg.src=data.imgUrl;
     popImg.style.display='block';
@@ -511,17 +543,15 @@ function showPopup(sq){
     popImg.src='';
     popImgPh.style.display='block';
   }
-
   if(data){
     popTitle.textContent=data.title||`خلية (${sq.ci},${sq.ri})`;
-    popBody.textContent=data.body||'';
-    popNoData.style.display='none';
+    popBody.textContent=data.body||data.text||'';
+    popNodata.style.display='none';
   } else {
     popTitle.textContent=`خلية (${sq.ci},${sq.ri})`;
     popBody.textContent='';
-    popNoData.style.display='block';
+    popNodata.style.display='block';
   }
-
   popOverlay.classList.add('open');
 }
 
@@ -531,7 +561,8 @@ function closePopup(){
 }
 
 /* ══════════════════════════════════════
-   IMPORT INFO DATA
+   IMPORT INFO JSON
+   Format: [{ci,ri,title,body,imgUrl}, ...]
 ══════════════════════════════════════ */
 function handleImport(e){
   const file=e.target.files[0]; if(!file) return;
@@ -539,23 +570,23 @@ function handleImport(e){
   reader.onload=ev=>{
     try{
       const arr=JSON.parse(ev.target.result);
-      if(!Array.isArray(arr)) throw new Error('ليس مصفوفة');
+      if(!Array.isArray(arr)) throw new Error();
       S.infoData={};
-      let count=0;
+      let n=0;
       arr.forEach(item=>{
         if(item.ci!==undefined && item.ri!==undefined){
           S.infoData[`${item.ci},${item.ri}`]={
-            title: item.title||'',
-            body:  item.body||item.text||item.description||'',
-            imgUrl:item.imgUrl||item.image||item.img||null
+            title:item.title||'',
+            body: item.body||item.text||item.description||'',
+            imgUrl:item.imgUrl||item.image||null
           };
-          count++;
+          n++;
         }
       });
-      importSt.textContent=`✅ تم تحميل ${count} سجل`;
+      importSt.textContent=`✅ ${n} سجل تم تحميله`;
       importSt.style.display='block';
-      toast(`✅ تم استيراد ${count} سجل معلومات`);
-    }catch(err){
+      toast(`✅ تم استيراد ${n} سجل`);
+    }catch{
       importSt.textContent='❌ خطأ في تنسيق الملف';
       importSt.style.display='block';
       toast('❌ خطأ في قراءة الملف');
@@ -566,109 +597,94 @@ function handleImport(e){
 }
 
 /* ══════════════════════════════════════
-   ZOOM & PAN
+   PINCH ZOOM — focal point stays fixed
+   between fingers (PDF-style smooth zoom)
 ══════════════════════════════════════ */
-let panSt=null, pinch=null;
-
-function screenToBoard(sx,sy){
-  const dx=sx-T.tx, dy=sy-T.ty;
-  const s=T.scale;
-  const ux=dx/s, uy=dy/s;
-  const r=-T.rot*Math.PI/180;
-  return{x:Math.cos(r)*ux-Math.sin(r)*uy, y:Math.sin(r)*ux+Math.cos(r)*uy};
-}
-
-function doZoom(newScale,pivotScreenX,pivotScreenY){
-  newScale=clamp(newScale, fitSc, MAX_SC);
-  if(Math.abs(newScale-T.scale)<0.0001) return;
-  const sf=newScale/T.scale;
-  T.tx=pivotScreenX-(pivotScreenX-T.tx)*sf;
-  T.ty=pivotScreenY-(pivotScreenY-T.ty)*sf;
-  T.scale=newScale;
-  clampPan();
-  applyT(); showZoom();
-}
-
-function onWheel(e){
-  if(S.screenLocked) return; // منع التكبير بالبكرة إذا كانت الشاشة مثبتة
-  e.preventDefault();
-  const rect=workspace.getBoundingClientRect();
-  const factor=e.deltaY<0?1.12:0.89;
-  doZoom(T.scale*factor, e.clientX-rect.left, e.clientY-rect.top);
-}
+let pinch=null;
 
 function onPinchStart(e){
-  if(S.screenLocked) return; // منع التكبير باللمس
   if(e.touches.length<2) return;
   e.preventDefault();
   const t0=e.touches[0], t1=e.touches[1];
   pinch={
-    d: Math.hypot(t0.clientX-t1.clientX, t0.clientY-t1.clientY),
-    cx:(t0.clientX+t1.clientX)/2,
-    cy:(t0.clientY+t1.clientY)/2,
-    startScale: T.scale
+    d:   Math.hypot(t0.clientX-t1.clientX, t0.clientY-t1.clientY),
+    cx:  (t0.clientX+t1.clientX)/2,
+    cy:  (t0.clientY+t1.clientY)/2,
+    sc0: T.scale,   // scale at pinch start
+    tx0: T.tx, ty0: T.ty
   };
 }
+
 function onPinchMove(e){
-  if(S.screenLocked || !pinch || e.touches.length<2) return;
+  if(!pinch||e.touches.length<2) return;
   e.preventDefault();
   const t0=e.touches[0], t1=e.touches[1];
   const d=Math.hypot(t0.clientX-t1.clientX, t0.clientY-t1.clientY);
   const cx=(t0.clientX+t1.clientX)/2;
   const cy=(t0.clientY+t1.clientY)/2;
-  const ratio=d/pinch.d;
-  doZoom(pinch.startScale*ratio, cx, cy);
-  T.tx+=cx-pinch.cx; T.ty+=cy-pinch.cy;
-  pinch.cx=cx; pinch.cy=cy;
-  clampPan(); applyT();
+
+  // Scale relative to START (avoids drift)
+  const newSc=clamp(pinch.sc0*(d/pinch.d), fitSc, MAX_SC);
+  const sf=newSc/pinch.sc0;
+  // Keep focal point (initial midpoint) fixed in screen space
+  T.tx=pinch.cx - (pinch.cx-pinch.tx0)*sf + (cx-pinch.cx);
+  T.ty=pinch.cy - (pinch.cy-pinch.ty0)*sf + (cy-pinch.cy);
+  T.scale=newSc;
+
+  clampPan();
+  applyT();
+  showZoom();
 }
+
 function onPinchEnd(){ pinch=null; }
 
+/* ══════════════════════════════════════
+   WHEEL ZOOM
+══════════════════════════════════════ */
+function onWheel(e){
+  e.preventDefault();
+  const rect=workspace.getBoundingClientRect();
+  const cx=e.clientX-rect.left, cy=e.clientY-rect.top;
+  const factor=e.deltaY<0?1.12:0.89;
+  const newSc=clamp(T.scale*factor, fitSc, MAX_SC);
+  if(newSc===T.scale) return;
+  const sf=newSc/T.scale;
+  T.tx=cx-(cx-T.tx)*sf;
+  T.ty=cy-(cy-T.ty)*sf;
+  T.scale=newSc;
+  clampPan();
+  applyT();
+  showZoom();
+}
+
+/* ══════════════════════════════════════
+   PAN
+══════════════════════════════════════ */
+let panSt=null;
+
 function onPanStart(e){
-  if(S.screenLocked) return; // منع التحريك
+  if(S.locked) return;
   if(e.target.closest('.sq')) return;
   if(e.touches && e.touches.length>=2) return;
-  panSt={px:getXY(e).x, py:getXY(e).y, tx:T.tx, ty:T.ty};
+  const p=getXY(e);
+  panSt={px:p.x, py:p.y, tx:T.tx, ty:T.ty};
 }
 function onPanMove(e){
-  if(S.screenLocked || !panSt || pinch) return;
+  if(!panSt||pinch) return;
   const p=getXY(e);
   T.tx=panSt.tx+(p.x-panSt.px);
   T.ty=panSt.ty+(p.y-panSt.py);
-  clampPan(); applyT();
+  clampPan();
+  applyT();
 }
 function onPanEnd(){ panSt=null; }
-
-/* ══════════════════════════════════════
-   BACKGROUND & ROTATION
-══════════════════════════════════════ */
-function handleBg(e){
-  const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const img=new Image();
-    img.onload=()=>{
-      S.bgW=img.naturalWidth; S.bgH=img.naturalHeight;
-      S.bgDataUrl=ev.target.result;
-      fitBoard(); toast('🖼 تم تحميل الصورة');
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file); e.target.value='';
-}
-
-function toggleRotation(){
-  S.rotDeg=S.rotDeg===0?270:0;
-  fitBoard(); renderSquares();
-  toast(S.rotDeg===270?'↻ تدوير 270°':'↺ اتجاه أصلي');
-}
 
 /* ══════════════════════════════════════
    MENU
 ══════════════════════════════════════ */
 function toggleMenu(){
-  const o=menuDrawer.classList.toggle('open');
-  menuBtn.classList.toggle('open',o);
+  const open=menuDrawer.classList.toggle('open');
+  menuBtn.classList.toggle('open', open);
 }
 function closeMenu(){
   menuDrawer.classList.remove('open');
@@ -682,14 +698,20 @@ let toastTid;
 function toast(msg){
   let el=document.querySelector('.toast');
   if(el){clearTimeout(toastTid);el.remove();}
-  el=document.createElement('div');el.className='toast';el.textContent=msg;
+  el=document.createElement('div');
+  el.className='toast';
+  el.textContent=msg;
   document.body.appendChild(el);
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
-  toastTid=setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},2400);
+  toastTid=setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=>el.remove(),300);
+  },2400);
 }
+
 function getXY(e){
   const s=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;
-  return{x:s.clientX,y:s.clientY};
+  return{x:s.clientX, y:s.clientY};
 }
 function clamp(v,lo,hi){return Math.max(lo,Math.min(v,hi));}
 
@@ -697,70 +719,84 @@ function clamp(v,lo,hi){return Math.max(lo,Math.min(v,hi));}
    BIND EVENTS
 ══════════════════════════════════════ */
 function bindEvents(){
+  // Menu toggle
   menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleMenu();});
   document.addEventListener('click',e=>{
     if(!menuDrawer.contains(e.target)&&e.target!==menuBtn) closeMenu();
   });
 
+  // Cover / Reveal all
   btnReveal.addEventListener('click',()=>{
-    S.squares.forEach(sq=>sq.visible=true);
-    renderSquares(); closeMenu(); toast('👁 تم كشف جميع المربعات');
+    S.squares.forEach(s=>s.revealed=true);
+    renderSquares(); closeMenu();
+    toast('👁 تم كشف جميع المربعات');
   });
   btnCover.addEventListener('click',()=>{
-    S.squares.forEach(sq=>sq.visible=false);
-    renderSquares(); closeMenu(); toast('🫣 تم تغطية جميع المربعات');
+    S.squares.forEach(s=>s.revealed=false);
+    renderSquares(); closeMenu();
+    toast('🫣 تم تغطية جميع المربعات');
   });
 
+  // Switches
+  swLock.addEventListener('change',()=>{
+    S.locked=swLock.checked;
+    toast(S.locked?'🔒 تم قفل التحريك':'🔓 تم فتح التحريك');
+  });
   swPopup.addEventListener('change',()=>{
-    toast(swPopup.checked?'💬 النافذة المنبثقة مفعّلة':'🔇 النافذة المنبثقة معطّلة');
+    toast(swPopup.checked?'💬 نافذة المعلومات مفعّلة':'🔕 نافذة المعلومات معطّلة');
   });
 
-  // تفعيل مفتاح تثبيت الشاشة وقفل دوران المتصفح
-  swLock.addEventListener('change', async () => {
-    S.screenLocked = swLock.checked;
-    
-    if (S.screenLocked) {
-      try {
-        // محاولة قفل اتجاه الشاشة على الوضع الحالي (طولي أو عرضي)
-        if (screen.orientation && screen.orientation.lock) {
-          await screen.orientation.lock(screen.orientation.type);
-        }
-      } catch (err) {
-        console.warn("لم يتمكن المتصفح من قفل التدوير (قد يتطلب وضع الشاشة الكاملة):", err);
-      }
-      toast('🔒 تم تثبيت الشاشة ومنع التحريك والتدوير');
-    } else {
-      // إلغاء قفل اتجاه الشاشة عند إيقاف التثبيت
-      if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock();
-      }
-      toast('🔓 يمكن تحريك وتدوير الشاشة الآن');
-    }
-  });
-
+  // Import
   btnImport.addEventListener('click',()=>importFile.click());
   importFile.addEventListener('change',handleImport);
 
+  // Background
   btnBg.addEventListener('click',()=>bgFile.click());
-  bgFile.addEventListener('change',handleBg);
-  btnRotate.addEventListener('click',()=>{toggleRotation();closeMenu();});
-  btnRstZoom.addEventListener('click',()=>{centerTransform();showZoom();closeMenu();});
+  bgFile.addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        S.bgW=img.naturalWidth; S.bgH=img.naturalHeight;
+        S.bgDataUrl=ev.target.result;
+        fitBoard();
+        toast('🖼 تم تحميل الصورة');
+      };
+      img.src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value='';
+  });
 
+  // Rotation
+  btnRotate.addEventListener('click',()=>{
+    S.rotDeg=S.rotDeg===0?270:0;
+    fitBoard(); renderSquares(); closeMenu();
+    toast(S.rotDeg===270?'↻ تدوير 270°':'↺ اتجاه أصلي');
+  });
+
+  // Reset zoom
+  btnCenter.addEventListener('click',()=>{
+    centerTransform(); showZoom(); closeMenu();
+    toast('⊡ تم التوسيط');
+  });
+
+  // Popup close
   popClose.addEventListener('click',closePopup);
-  popOverlay.addEventListener('click',e=>{if(e.target===popOverlay)closePopup();});
+  popOverlay.addEventListener('click',e=>{
+    if(e.target===popOverlay) closePopup();
+  });
 
-  // Zoom: wheel
-  workspace.addEventListener('wheel',onWheel,{passive:false});
-
-  // Pinch zoom (touch)
+  // Touch: pinch zoom
   workspace.addEventListener('touchstart',e=>{
-    if(e.touches.length>=2){onPinchStart(e);}
-    else{onPanStart(e);}
+    if(e.touches.length>=2){ onPinchStart(e); }
+    else{ onPanStart(e); }
   },{passive:false});
   workspace.addEventListener('touchmove',e=>{
-    e.preventDefault(); // لمنع تحريك الصفحة بشكل افتراضي
-    if(e.touches.length>=2){onPinchMove(e);}
-    else{onPanMove(e);}
+    e.preventDefault();
+    if(e.touches.length>=2){ onPinchMove(e); }
+    else{ onPanMove(e); }
   },{passive:false});
   workspace.addEventListener('touchend',e=>{
     if(e.touches.length<2) onPinchEnd();
@@ -771,378 +807,34 @@ function bindEvents(){
   workspace.addEventListener('mousedown',onPanStart);
   document.addEventListener('mousemove',onPanMove);
   document.addEventListener('mouseup',onPanEnd);
-}
 
-/* ══════════════════════════════════════
-   PWA - SERVICE WORKER REGISTRATION
-══════════════════════════════════════ */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('✅ تم تسجيل Service Worker بنجاح:', reg.scope))
-      .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
-  });
-    else{
-      const{x,y}=cellRect(drag.origCi,drag.origRi);
-      drag.el.style.left=x+'px';drag.el.style.top=y+'px';
-      toast('⚠️ هذه الخانة مشغولة');
-    }
-  }
-  drag.el.classList.remove('dragging');
-  drag=null;
-}
-
-/* ══════════════════════════════════════
-   RUBBER BAND
-══════════════════════════════════════ */
-function startRubber(e){
-  const p=getXY(e);const bp=screenToBoard(p.x,p.y);
-  rubber={sx:bp.x,sy:bp.y,cx:bp.x,cy:bp.y};
-  rubberBand.style.cssText=`display:block;left:${bp.x}px;top:${bp.y}px;width:0;height:0;`;
-}
-function onRubberMove(e){
-  if(!rubber)return;e.preventDefault();
-  const p=getXY(e);const bp=screenToBoard(p.x,p.y);
-  rubber.cx=bp.x;rubber.cy=bp.y;
-  const l=Math.min(rubber.sx,rubber.cx),t=Math.min(rubber.sy,rubber.cy);
-  rubberBand.style.left=l+'px';rubberBand.style.top=t+'px';
-  rubberBand.style.width=Math.abs(rubber.cx-rubber.sx)+'px';
-  rubberBand.style.height=Math.abs(rubber.cy-rubber.sy)+'px';
-}
-function onRubberEnd(){
-  if(!rubber)return;
-  rubberBand.style.display='none';
-  const l=Math.min(rubber.sx,rubber.cx),t=Math.min(rubber.sy,rubber.cy);
-  const r=l+Math.abs(rubber.cx-rubber.sx),b=t+Math.abs(rubber.cy-rubber.sy);
-  if(Math.abs(r-l)<5&&Math.abs(b-t)<5){rubber=null;return;}
-  S.selIds=new Set();
-  S.squares.forEach(sq=>{
-    const{x,y,w,h}=cellRect(sq.ci,sq.ri);
-    if(x<r&&x+w>l&&y<b&&y+h>t)S.selIds.add(sq.id);
-  });
-  rubber=null;
-  renderSquares();updateColorUI();
-  if(S.selIds.size>0)toast(`✅ تم تحديد ${S.selIds.size} مربع`);
-}
-
-/* ══════════════════════════════════════
-   PAN — req #4: fixed delta accumulation,
-   no offset recalculation on move,
-   req #5: clamp so board stays visible
-══════════════════════════════════════ */
-function startPan(e){
-  const p=getXY(e);
-  panStart={px:p.x,py:p.y,tx:T.tx,ty:T.ty};
-  panActive=true;
-}
-function onPanMove(e){
-  if(!panActive||!panStart)return;
-  const p=getXY(e);
-  // Fixed delta: new position = original + total delta from start point
-  T.tx=panStart.tx+(p.x-panStart.px);
-  T.ty=panStart.ty+(p.y-panStart.py);
-  clampPan();
-  applyT();
-}
-function endPan(){panActive=false;panStart=null;}
-
-/* ══════════════════════════════════════
-   ZOOM — zoom in/out freely between fitSc and MAX_SC
-   fitSc is the scale where the board exactly fills workspace
-   Double-tap the ⚙ button label area resets zoom to fit
-══════════════════════════════════════ */
-function doZoom(factor,scx,scy){
-  const minSc = fitSc > 0 ? fitSc : 0.1;
-  const newScale = clamp(T.scale*factor, minSc, MAX_SC);
-  if(Math.abs(newScale-T.scale)<0.0001) return;
-  const sf = newScale/T.scale;
-  T.tx = scx-(scx-T.tx)*sf;
-  T.ty = scy-(scy-T.ty)*sf;
-  T.scale = newScale;
-  clampPan();
-  applyT(); showZoom();
-}
-
-function onWheel(e){
-  e.preventDefault();
-  const rect = workspace.getBoundingClientRect();
-  const factor = e.deltaY < 0 ? 1.12 : 0.89; // up=zoom-in, down=zoom-out
-  doZoom(factor, e.clientX-rect.left, e.clientY-rect.top);
-}
-
-function onPinchStart(e){
-  if(e.touches.length!==2) return;
-  e.preventDefault();
-  pinch={
-    d: Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
-                  e.touches[0].clientY-e.touches[1].clientY),
-    cx:(e.touches[0].clientX+e.touches[1].clientX)/2,
-    cy:(e.touches[0].clientY+e.touches[1].clientY)/2,
-  };
-}
-function onPinchMove(e){
-  if(!pinch||e.touches.length!==2) return;
-  e.preventDefault();
-  const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
-                       e.touches[0].clientY-e.touches[1].clientY);
-  const rect = workspace.getBoundingClientRect();
-  doZoom(d/pinch.d, pinch.cx-rect.left, pinch.cy-rect.top);
-  pinch.d = d;
-}
-function onPinchEnd(){ pinch=null; }
-
-/* ══════════════════════════════════════
-   ADD SQUARE
-══════════════════════════════════════ */
-const COLORS=['#5BC8F5','#A8D8A8','#F5CBA7','#D7BDE2','#F9E79F',
-  '#AED6F1','#A9DFBF','#F1948A','#73C6B6','#FAD7A0',
-  '#D2B4DE','#ABEBC6','#F0B27A','#FF8A80','#B9F6CA'];
-
-function addOne(){
-  const free=[...VALID_CELLS].filter(k=>{const[c,r]=k.split(',').map(Number);return!isOccupied(c,r);});
-  if(!free.length){toast('⚠️ لا توجد خانات فارغة!');return null;}
-  free.sort(()=>Math.random()-.5);
-  const[ci,ri]=free[0].split(',').map(Number);
-  const sq={id:String(S.nextId++),ci,ri,color:COLORS[S.squares.length%COLORS.length],visible:true};
-  S.squares.push(sq);
-  return sq;
-}
-
-function addSquare(){
-  const sq=addOne();if(!sq)return;
-  S.selIds=new Set([sq.id]);
-  const el=buildEl(sq);
-  el.style.transition='transform .2s cubic-bezier(.34,1.56,.64,1)';
-  el.style.transform='scale(0.2)';
-  board.appendChild(el);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    el.style.transform='scale(1)';setTimeout(()=>el.style.transition='',250);
-  }));
-  updateColorUI();
-}
-
-// req #12: batch add
-function batchAdd(){
-  const n=parseInt(batchN.value)||5;
-  let added=0;
-  for(let i=0;i<n;i++){if(addOne())added++;else break;}
-  if(added>0){renderSquares();updateColorUI();}
-  toast(added>0?`➕ تمت إضافة ${added} مربع`:'⚠️ لا توجد خانات كافية');
-}
-
-/* ══════════════════════════════════════
-   BACKGROUND
-══════════════════════════════════════ */
-function handleBg(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const img=new Image();
-    img.onload=()=>{
-      S.bgW=img.naturalWidth;S.bgH=img.naturalHeight;
-      S.bgDataUrl=ev.target.result;
-      board.style.backgroundImage=`url(${S.bgDataUrl})`;
-      board.style.backgroundSize='100% 100%';
-      board.classList.add('has-bg');
-      fitBoard();drawGrid();
-      toast('🖼️ تم تحميل الصورة');
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);e.target.value='';
-}
-
-/* ══════════════════════════════════════
-   MODES
-══════════════════════════════════════ */
-function toggleMode(){
-  S.mode=S.mode==='edit'?'play':'edit';
-  if(S.mode==='play')S.selIds=new Set();
-  renderAll();
-  closeMenu();
-  toast(S.mode==='play'?'▶ وضع التفاعل':'✏️ وضع التعديل');
-}
-function setSubMode(m){
-  S.subMode=m;
-  if(m==='delete'){S.selIds=new Set();updateColorUI();}
-  document.body.classList.toggle('delete-mode',m==='delete');
-  btnSubEdit.classList.toggle('active',m==='edit');
-  btnSubDel.classList.toggle('active',m==='delete');
-  drawGrid();
-  toast(m==='delete'?'🗑 وضع الحذف':'✏️ وضع التعديل');
-}
-function toggleRotation(){
-  S.rotDeg=S.rotDeg===0?270:0;
-  fitBoard();drawGrid();renderSquares();
-  toast(S.rotDeg===270?'↻ تدوير 270°':'↺ اتجاه أصلي');
-}
-
-/* ══════════════════════════════════════
-   MENU
-══════════════════════════════════════ */
-function toggleMenu(){
-  const open=menuDrawer.classList.toggle('open');
-  menuBtn.classList.toggle('open',open);
-}
-function closeMenu(){
-  menuDrawer.classList.remove('open');
-  menuBtn.classList.remove('open');
-}
-
-/* ══════════════════════════════════════
-   TOAST
-══════════════════════════════════════ */
-let toastTid;
-function toast(msg){
-  let el=document.querySelector('.toast');
-  if(el){clearTimeout(toastTid);el.remove();}
-  el=document.createElement('div');el.className='toast';el.textContent=msg;
-  document.body.appendChild(el);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
-  toastTid=setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},2200);
-}
-function getXY(e){const s=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;return{x:s.clientX,y:s.clientY};}
-function clamp(v,lo,hi){return Math.max(lo,Math.min(v,hi));}
-
-/* ══════════════════════════════════════
-   EVENTS
-══════════════════════════════════════ */
-function bindEvents(){
-  menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleMenu();});
-  document.addEventListener('click',e=>{
-    if(!menuDrawer.contains(e.target)&&e.target!==menuBtn)closeMenu();
-  });
-
-  btnMode.addEventListener('click',toggleMode);
-  btnSubEdit.addEventListener('click',()=>setSubMode('edit'));
-  btnSubDel.addEventListener('click', ()=>setSubMode('delete'));
-  btnAdd.addEventListener('click',()=>{addSquare();});
-  btnBatch.addEventListener('click',batchAdd);
-  btnBg.addEventListener('click',()=>bgFile.click());
-  bgFile.addEventListener('change',handleBg);
-  btnRotate.addEventListener('click',toggleRotation);
-  btnResetZoom.addEventListener('click',()=>{centerTransform();showZoom();closeMenu();});
-  btnSave.addEventListener('click',()=>{saveState();closeMenu();});
-  btnExport.addEventListener('click',()=>{exportPreset();closeMenu();});
-  btnReset.addEventListener('click',()=>{resetState();closeMenu();});
-
-  /* ── WORKSPACE POINTER EVENTS ──
-     Priority (checked in order):
-     1. Square pointerdown → drag (handled in buildEl)
-     2. Empty board area → rubber-band (edit) or pan (play)
-     3. Two-finger → pan always
-  ── */
-
-  // Board background → rubber-band in edit, pan in play
-  board.addEventListener('pointerdown',e=>{
-    if(e.target.closest('.sq'))return; // squares handle themselves
-    if(S.mode==='play'){startPan(e);return;}
-    if(S.subMode==='delete')return;
-    // edit mode: deselect + rubber
-    if(!e.ctrlKey&&!e.metaKey&&!e.shiftKey){
-      S.selIds=new Set();renderSquares();updateColorUI();
-    }
-    startRubber(e);
-  });
-
-  // Global move
-  document.addEventListener('pointermove',e=>{
-    if(drag){onDragMove(e);}
-    else if(rubber){onRubberMove(e);}
-    else if(panActive){onPanMove(e);}
-  },{passive:false});
-
-  // Global up
-  document.addEventListener('pointerup',()=>{
-    onDragEnd();onRubberEnd();endPan();
-  });
-  document.addEventListener('pointercancel',()=>{
-    onDragEnd();onRubberEnd();endPan();
-  });
-
-  // Touch: two-finger pan (both modes)
-  workspace.addEventListener('touchstart',e=>{
-    if(e.touches.length===2){onPinchStart(e);startPan(e);}
-  },{passive:false});
-  workspace.addEventListener('touchmove',e=>{
-    if(e.touches.length===2){onPinchMove(e);onPanMove(e);}
-  },{passive:false});
-  workspace.addEventListener('touchend',e=>{
-    if(e.touches.length<2)onPinchEnd();
-    endPan();
-  });
-
-  // Zoom wheel (only zoom-in)
+  // Wheel zoom
   workspace.addEventListener('wheel',onWheel,{passive:false});
 }
 
 /* ══════════════════════════════════════
-   PWA - SERVICE WORKER REGISTRATION
+   PWA — Service Worker
 ══════════════════════════════════════ */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('✅ تم تسجيل Service Worker بنجاح:', reg.scope))
-      .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
+      .then(r=>console.log('✅ SW registered:',r.scope))
+      .catch(e=>console.warn('SW failed:',e));
   });
-}
-
-init();
-</script>
-</body>
-</html>
-berEnd();endPan();
-  });
-  document.addEventListener('pointercancel',()=>{
-    onDragEnd();onRubberEnd();endPan();
-  });
-
-  // Touch: two-finger pan (both modes)
-  workspace.addEventListener('touchstart',e=>{
-    if(e.touches.length===2){onPinchStart(e);startPan(e);}
-  },{passive:false});
-  workspace.addEventListener('touchmove',e=>{
-    if(e.touches.length===2){onPinchMove(e);onPanMove(e);}
-  },{passive:false});
-  workspace.addEventListener('touchend',e=>{
-    if(e.touches.length<2)onPinchEnd();
-    endPan();
-  });
-
-  // Zoom wheel (only zoom-in)
-  workspace.addEventListener('wheel',onWheel,{passive:false});
 }
 
 /* ══════════════════════════════════════
-   PWA - SERVICE WORKER REGISTRATION
+   INIT
 ══════════════════════════════════════ */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('✅ تم تسجيل Service Worker بنجاح:', reg.scope))
-      .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
-  });
-}
-
-init();
-</script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registration successful');
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-    });
-  }
-</script>
-</body>
-</html>
-;
-    });
-  }
+window.addEventListener('load',()=>{
+  fitBoard();
+  renderSquares();
+  bindEvents();
+});
+window.addEventListener('resize',()=>{
+  fitBoard();
+  renderSquares();
+});
 </script>
 </body>
 </html>
