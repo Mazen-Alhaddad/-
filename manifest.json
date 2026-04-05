@@ -4,7 +4,7 @@
   "description": "تطبيق تفاعلي لاستكشاف وعرض عناصر الجدول الدوري",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "background_color": "#0c0c1a",
   "theme_color": "#0c0c1a",
   "lang": "ar",
