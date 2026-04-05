@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════
    Squares Board — Service Worker v1
 ══════════════════════════════════════════ */
-const CACHE = 'sqboard-v1';
+const CACHE = 'sqboard-v2';
 
 const PRECACHE = [
   './',
