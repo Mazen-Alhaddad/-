@@ -1,6 +1,6 @@
 {
   "name": "الجدول الدوري",
-  "short_name": "المربعات",
+  "short_name": "الجدول  الدوري",
   "description": "لوحة تفاعلية لوضع مربعات ملونة فوق صورة خلفية",
   "start_url": ".",
   "display": "standalone",
