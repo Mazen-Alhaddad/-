@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════
    الجدول الدوري — Service Worker v2
-   يدعم العمل بدون إنترنت (Offline Mode)
+   يدعم العمل بدون إنترنت (Offline Mode) وحفظ الصور الخارجية
 ══════════════════════════════════════════ */
 
 const CACHE_NAME = 'periodic-table-v2';
@@ -35,24 +35,30 @@ self.addEventListener('activate', event => {
 });
 
 /* ── المرحلة 3: جلب البيانات (Fetch) ── */
-// هذا هو الجزء الذي سألت عنه، وهو المسؤول عن تشغيل التطبيق أوفلاين
 self.addEventListener('fetch', event => {
-  // تجاهل أي طلبات ليست من نوع GET (مثل طلبات الإضافة أو الحذف)
+  // تجاهل أي طلبات ليست من نوع GET
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
-      // إذا كان الملف موجوداً في الذاكرة، استخرجه منها
+      // 1. إذا كان الملف (أو الصورة) موجوداً في الكاش، قم بإرجاعه فوراً
       if (cachedResponse) {
         return cachedResponse;
       }
 
-      // إذا لم يكن موجوداً، اطلبه من الإنترنت واحفظ نسخة منه للمرة القادمة
+      // 2. إذا لم يكن موجوداً، اطلبه من الإنترنت
       return fetch(event.request).then(response => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
+        // التحقق من صلاحية الاستجابة
+        // استجابات الصور من سيرفرات خارجية (بدون CORS) تظهر بـ status === 0 أو type === 'opaque'
+        const isValidResponse = response && 
+                               (response.status === 200 || response.status === 0) && 
+                               (response.type === 'basic' || response.type === 'cors' || response.type === 'opaque');
+
+        if (!isValidResponse) {
           return response;
         }
 
+        // استنساخ الاستجابة وحفظها في الكاش للمرة القادمة
         const responseToCache = response.clone();
         caches.open(CACHE_NAME).then(cache => {
           cache.put(event.request, responseToCache);
@@ -60,7 +66,7 @@ self.addEventListener('fetch', event => {
 
         return response;
       }).catch(() => {
-        // إذا فشل الإنترنت تماماً، افتح الصفحة الرئيسية
+        // إذا فشل الاتصال بالإنترنت وكان المستخدم يحاول فتح الصفحة الرئيسية
         if (event.request.mode === 'navigate') {
           return caches.match('./index.html');
         }

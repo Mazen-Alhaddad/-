@@ -43,6 +43,35 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
 /* revealed = transparent, but still clickable */
 .sq.revealed{opacity:0;}
 
+/* ══ INLINE POPUP ══ */
+#inline-popup {
+  position: absolute;
+  z-index: 50; 
+  background: rgba(10,10,28,0.95);
+  border: 1px solid rgba(0,212,255,0.4);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+  display: none;
+  overflow: hidden;
+  pointer-events: none; 
+}
+#inline-popup img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#inline-fallback-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 14px;
+  text-align: center;
+  padding: 10px;
+}
+
 /* ══ SETTINGS BUTTON ══ */
 #menu-btn{
   position:fixed;top:14px;right:14px;z-index:1000;
@@ -98,9 +127,6 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
 .m-btn.reveal:hover{background:rgba(0,212,255,.2);}
 .m-btn.cover{background:rgba(255,180,0,.08);color:#ffd060;}
 .m-btn.cover:hover{background:rgba(255,180,0,.18);}
-.m-btn.import-btn{background:rgba(0,212,255,.08);color:#00d4ff;
-  border:1px dashed rgba(0,212,255,.35);}
-.m-btn.import-btn:hover{background:rgba(0,212,255,.18);}
 
 /* ── SWITCH ROW ── */
 .sw-row{
@@ -123,73 +149,6 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
   box-shadow:0 1px 5px rgba(0,0,0,.35);
 }
 .sw input:checked+.sw-track::after{transform:translateX(20px);}
-
-/* ── IMPORT STATUS ── */
-#import-status{
-  font-size:10px;color:rgba(0,212,255,.6);
-  padding:2px 4px;display:none;
-}
-
-/* ══ POPUP ══ */
-#pop-overlay{
-  position:fixed;inset:0;z-index:2000;
-  background:rgba(0,0,0,.65);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  display:none;align-items:center;justify-content:center;
-  padding:16px;
-}
-#pop-overlay.open{display:flex;}
-
-#pop-box{
-  position:relative;width:100%;max-width:390px;
-  background:rgba(10,10,28,.98);
-  border:1px solid rgba(255,255,255,.13);
-  border-radius:20px;overflow:hidden;
-  display:flex;flex-direction:column;
-  max-height:88vh;
-  box-shadow:0 24px 64px rgba(0,0,0,.85);
-}
-
-#pop-close{
-  position:absolute;top:10px;left:10px;z-index:10;
-  width:32px;height:32px;border-radius:50%;
-  background:rgba(255,255,255,.12);border:none;
-  color:#fff;font-size:15px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .15s;
-}
-#pop-close:hover{background:rgba(255,59,48,.5);}
-
-#pop-img-wrap{
-  width:100%;aspect-ratio:4/3;
-  background:#0a0a18;flex-shrink:0;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-#pop-img{width:100%;height:100%;object-fit:contain;display:none;}
-#pop-img-ph{font-size:48px;opacity:.18;}
-
-#pop-info{
-  flex:1;overflow-y:auto;padding:18px 18px 22px;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.12) transparent;
-}
-#pop-info::-webkit-scrollbar{width:3px;}
-#pop-info::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.14);border-radius:2px;
-}
-
-#pop-title{
-  font-size:17px;font-weight:800;color:#edeefa;
-  margin-bottom:10px;line-height:1.4;
-}
-#pop-body{
-  font-size:13px;color:rgba(255,255,255,.62);
-  line-height:1.85;white-space:pre-wrap;
-}
-#pop-nodata{
-  font-size:13px;color:rgba(255,255,255,.25);
-  text-align:center;padding:24px 0;display:none;
-}
 
 /* ══ ZOOM INDICATOR ══ */
 #zoom-ind{
@@ -219,21 +178,21 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
 </head>
 <body>
 
-<!-- WORKSPACE -->
 <div id="workspace">
-  <div id="board" dir="ltr"></div>
+  <div id="board" dir="ltr">
+    <div id="inline-popup">
+      <img id="inline-img" src="" alt="">
+      <div id="inline-fallback-text" style="display:none;"></div>
+    </div>
+  </div>
 </div>
 
-<!-- ZOOM INDICATOR -->
 <div id="zoom-ind">100%</div>
 
-<!-- SETTINGS BUTTON -->
 <button id="menu-btn" title="الإعدادات">⚙</button>
 
-<!-- SETTINGS DRAWER -->
 <div id="menu-drawer">
 
-  <!-- Cover / Reveal -->
   <div class="m-section">
     <div class="m-label">التغطية والكشف</div>
     <button class="m-btn reveal" id="btn-reveal">
@@ -244,7 +203,6 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
     </button>
   </div>
 
-  <!-- Options -->
   <div class="m-section">
     <div class="m-label">الخيارات</div>
     <div class="sw-row">
@@ -254,8 +212,17 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
         <div class="sw-track"></div>
       </label>
     </div>
+    
     <div class="sw-row">
-      <span>نافذة المعلومات عند الكشف</span>
+      <span>تفعيل ميزة الصور كلياً</span>
+      <label class="sw">
+        <input type="checkbox" id="sw-img-feature" checked>
+        <div class="sw-track"></div>
+      </label>
+    </div>
+
+    <div class="sw-row">
+      <span>نافذة الصور عند الكشف</span>
       <label class="sw">
         <input type="checkbox" id="sw-popup" checked>
         <div class="sw-track"></div>
@@ -263,17 +230,6 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
     </div>
   </div>
 
-  <!-- Data import -->
-  <div class="m-section">
-    <div class="m-label">بيانات المعلومات</div>
-    <button class="m-btn import-btn" id="btn-import">
-      <span class="ic">📂</span> استيراد ملف JSON
-    </button>
-    <input type="file" id="import-file" accept=".json,application/json" hidden>
-    <div id="import-status"></div>
-  </div>
-
-  <!-- View -->
   <div class="m-section">
     <div class="m-label">العرض</div>
     <button class="m-btn" id="btn-bg">
@@ -290,28 +246,11 @@ body{font-family:'Cairo',sans-serif;background:#0c0c1a;user-select:none;height:1
 
 </div>
 
-<!-- INFO POPUP -->
-<div id="pop-overlay">
-  <div id="pop-box">
-    <button id="pop-close">✕</button>
-    <div id="pop-img-wrap">
-      <img id="pop-img" alt="">
-      <div id="pop-img-ph">🔬</div>
-    </div>
-    <div id="pop-info">
-      <div id="pop-title"></div>
-      <div id="pop-body"></div>
-      <div id="pop-nodata">لا توجد بيانات لهذا المربع</div>
-    </div>
-  </div>
-</div>
-
 <script>
 'use strict';
 
 /* ══════════════════════════════════════
    GRID — from My_drawing.xml (VP 240×344)
-   ci=6,ri=1 removed (extra square beside H)
 ══════════════════════════════════════ */
 const VP_W=240, VP_H=344;
 const COL_XS=[68.10,86.41,105.26,123.93,142.43,160.87,179.39,197.18];
@@ -323,7 +262,7 @@ const VALID_CELLS=new Set();
   function a(c0,c1,r0,r1){
     for(let c=c0;c<=c1;c++)
       for(let r=r0;r<=r1;r++){
-        if(c===6&&r===1) continue; // remove extra cell
+        if(c===6&&r===1) continue;
         VALID_CELLS.add(`${c},${r}`);
       }
   }
@@ -331,8 +270,25 @@ const VALID_CELLS=new Set();
 })();
 
 /* ══════════════════════════════════════
-   PRESET COLORS (from preset.json)
-   Hydrogen ci=6,ri=0 → yellow #EAD800
+   NUMBER MAPPING LOGIC
+══════════════════════════════════════ */
+const cellToNum = {};
+(function(){
+  const sortedCells = Array.from(VALID_CELLS).map(s => {
+    const parts = s.split(',');
+    return { ci: parseInt(parts[0]), ri: parseInt(parts[1]) };
+  }).sort((a, b) => {
+    if (a.ri !== b.ri) return a.ri - b.ri; 
+    return b.ci - a.ci; 
+  });
+
+  sortedCells.forEach((cell, index) => {
+    cellToNum[`${cell.ci},${cell.ri}`] = index + 1;
+  });
+})();
+
+/* ══════════════════════════════════════
+   PRESET COLORS
 ══════════════════════════════════════ */
 const PRESET=[
   {ci:2,ri:6,color:"#86D5F1"},{ci:0,ri:0,color:"#86D5F1"},
@@ -358,21 +314,21 @@ const PRESET=[
   {ci:1,ri:9,color:"#86D5F1"},{ci:2,ri:7,color:"#86D5F1"},
   {ci:2,ri:0,color:"#86D5F1"},{ci:2,ri:15,color:"#9DD45B"},
   {ci:1,ri:0,color:"#86D5F1"},{ci:3,ri:13,color:"#9DD45B"},
-  {ci:6,ri:0,color:"#EAD800"},/* Hydrogen — yellow */
-  {ci:2,ri:8,color:"#86D5F1"},{ci:3,ri:12,color:"#86D5F1"},
-  {ci:3,ri:2,color:"#86D5F1"},{ci:3,ri:14,color:"#9DD45B"},
-  {ci:2,ri:11,color:"#86D5F1"},{ci:1,ri:10,color:"#86D5F1"},
-  {ci:2,ri:14,color:"#9DD45B"},{ci:1,ri:5,color:"#86D5F1"},
-  {ci:5,ri:1,color:"#86D5F1"},{ci:1,ri:13,color:"#86D5F1"},
-  {ci:6,ri:17,color:"#EAD800"},{ci:1,ri:14,color:"#86D5F1"},
-  {ci:4,ri:14,color:"#EAD800"},{ci:5,ri:15,color:"#EAD800"},
-  {ci:5,ri:13,color:"#EAD800"},{ci:2,ri:13,color:"#86D5F1"},
-  {ci:5,ri:16,color:"#EAD800"},{ci:5,ri:17,color:"#EAD800"},
-  {ci:4,ri:15,color:"#EAD800"},{ci:4,ri:16,color:"#EAD800"},
-  {ci:5,ri:14,color:"#EAD800"},{ci:4,ri:17,color:"#EAD800"},
-  {ci:3,ri:17,color:"#EAD800"},{ci:2,ri:16,color:"#EAD800"},
-  {ci:2,ri:17,color:"#EAD800"},{ci:1,ri:17,color:"#EAD800"},
-  {ci:3,ri:16,color:"#EAD800"},{ci:3,ri:15,color:"#EAD800"}
+  {ci:6,ri:0,color:"#EAD800"},{ci:2,ri:8,color:"#86D5F1"},
+  {ci:3,ri:12,color:"#86D5F1"},{ci:3,ri:2,color:"#86D5F1"},
+  {ci:3,ri:14,color:"#9DD45B"},{ci:2,ri:11,color:"#86D5F1"},
+  {ci:1,ri:10,color:"#86D5F1"},{ci:2,ri:14,color:"#9DD45B"},
+  {ci:1,ri:5,color:"#86D5F1"},{ci:5,ri:1,color:"#86D5F1"},
+  {ci:1,ri:13,color:"#86D5F1"},{ci:6,ri:17,color:"#EAD800"},
+  {ci:1,ri:14,color:"#86D5F1"},{ci:4,ri:14,color:"#EAD800"},
+  {ci:5,ri:15,color:"#EAD800"},{ci:5,ri:13,color:"#EAD800"},
+  {ci:2,ri:13,color:"#86D5F1"},{ci:5,ri:16,color:"#EAD800"},
+  {ci:5,ri:17,color:"#EAD800"},{ci:4,ri:15,color:"#EAD800"},
+  {ci:4,ri:16,color:"#EAD800"},{ci:5,ri:14,color:"#EAD800"},
+  {ci:4,ri:17,color:"#EAD800"},{ci:3,ri:17,color:"#EAD800"},
+  {ci:2,ri:16,color:"#EAD800"},{ci:2,ri:17,color:"#EAD800"},
+  {ci:1,ri:17,color:"#EAD800"},{ci:3,ri:16,color:"#EAD800"},
+  {ci:3,ri:15,color:"#EAD800"}
 ].filter(p=>VALID_CELLS.has(`${p.ci},${p.ri}`));
 
 /* ══════════════════════════════════════
@@ -382,7 +338,6 @@ let S={
   rotDeg:0,
   bgDataUrl:null, bgW:null, bgH:null,
   squares: PRESET.map((p,i)=>({id:String(i),ci:p.ci,ri:p.ri,color:p.color,revealed:false})),
-  infoData:{},
   locked:false,
 };
 
@@ -396,29 +351,24 @@ const MAX_SC=8;
 /* ══════════════════════════════════════
    DOM REFS
 ══════════════════════════════════════ */
-const workspace =document.getElementById('workspace');
-const board     =document.getElementById('board');
-const menuBtn   =document.getElementById('menu-btn');
-const menuDrawer=document.getElementById('menu-drawer');
-const swLock    =document.getElementById('sw-lock');
-const swPopup   =document.getElementById('sw-popup');
-const btnReveal =document.getElementById('btn-reveal');
-const btnCover  =document.getElementById('btn-cover');
-const btnImport =document.getElementById('btn-import');
-const importFile=document.getElementById('import-file');
-const importSt  =document.getElementById('import-status');
-const btnBg     =document.getElementById('btn-bg');
-const bgFile    =document.getElementById('bg-file');
-const btnRotate =document.getElementById('btn-rotate');
-const btnCenter =document.getElementById('btn-center');
-const popOverlay=document.getElementById('pop-overlay');
-const popClose  =document.getElementById('pop-close');
-const popImg    =document.getElementById('pop-img');
-const popImgPh  =document.getElementById('pop-img-ph');
-const popTitle  =document.getElementById('pop-title');
-const popBody   =document.getElementById('pop-body');
-const popNodata =document.getElementById('pop-nodata');
-const zoomInd   =document.getElementById('zoom-ind');
+const workspace    = document.getElementById('workspace');
+const board        = document.getElementById('board');
+const menuBtn      = document.getElementById('menu-btn');
+const menuDrawer   = document.getElementById('menu-drawer');
+const swLock       = document.getElementById('sw-lock');
+const swPopup      = document.getElementById('sw-popup');
+const swImgFeature = document.getElementById('sw-img-feature'); 
+const btnReveal    = document.getElementById('btn-reveal');
+const btnCover     = document.getElementById('btn-cover');
+const btnBg        = document.getElementById('btn-bg');
+const bgFile       = document.getElementById('bg-file');
+const btnRotate    = document.getElementById('btn-rotate');
+const btnCenter    = document.getElementById('btn-center');
+const zoomInd      = document.getElementById('zoom-ind');
+
+const inlinePopup  = document.getElementById('inline-popup');
+const inlineImg    = document.getElementById('inline-img');
+const inlineFall   = document.getElementById('inline-fallback-text');
 
 /* ══════════════════════════════════════
    GRID HELPERS
@@ -435,11 +385,7 @@ function cellRect(ci,ri){
 }
 
 /* ══════════════════════════════════════
-   BOARD SIZING & TRANSFORM
-   CSS order: translate → scale → rotate
-   For rotate(270°):
-     displayed bbox = natH × natW
-     T.ty += natW*scale  (compensates negative-y shift)
+   BOARD SIZING & INLINE POPUP SIZING
 ══════════════════════════════════════ */
 function fitBoard(){
   const wW=workspace.clientWidth, wH=workspace.clientHeight;
@@ -454,6 +400,23 @@ function fitBoard(){
     board.style.backgroundSize='100% 100%';
   }
   centerTransform();
+  updatePopupSize();
+}
+
+function updatePopupSize(){
+  const bW = board.clientWidth, bH = board.clientHeight;
+  const startCol = 4, endCol = 7;
+  const startRow = 7, endRow = 10;
+
+  const pX = vx(COL_XS[startCol], bW);
+  const pY = vy(ROW_YS[startRow], bH);
+  const pW = vx(COL_XS[endCol] - COL_XS[startCol], bW);
+  const pH = vy(ROW_YS[endRow] - ROW_YS[startRow], bH);
+
+  inlinePopup.style.left = pX + 'px';
+  inlinePopup.style.top = pY + 'px';
+  inlinePopup.style.width = pW + 'px';
+  inlinePopup.style.height = pH + 'px';
 }
 
 function centerTransform(){
@@ -503,8 +466,6 @@ function showZoom(){
 
 /* ══════════════════════════════════════
    RENDER SQUARES
-   revealed=false → square SHOWS (covered)
-   revealed=true  → square HIDDEN (uncovered, shows bg)
 ══════════════════════════════════════ */
 function renderSquares(){
   document.querySelectorAll('.sq').forEach(el=>el.remove());
@@ -520,87 +481,46 @@ function renderSquares(){
 }
 
 /* ══════════════════════════════════════
-   SQUARE CLICK — toggle cover/reveal
+   SQUARE CLICK & INLINE POPUP LOGIC
 ══════════════════════════════════════ */
-function onSquareClick(sq,el){
-  sq.revealed=!sq.revealed;
+function onSquareClick(sq, el){
+  sq.revealed = !sq.revealed;
   el.classList.toggle('revealed', sq.revealed);
-  // Show popup when revealing (uncovering)
-  if(sq.revealed && swPopup.checked) showPopup(sq);
-}
 
-/* ══════════════════════════════════════
-   POPUP
-══════════════════════════════════════ */
-function showPopup(sq){
-  const data=S.infoData[`${sq.ci},${sq.ri}`];
-  if(data && data.imgUrl){
-    popImg.src=data.imgUrl;
-    popImg.style.display='block';
-    popImgPh.style.display='none';
+  if(sq.revealed && swPopup.checked && swImgFeature.checked){
+    showInlinePopup(sq);
   } else {
-    popImg.style.display='none';
-    popImg.src='';
-    popImgPh.style.display='block';
+    inlinePopup.style.display = 'none';
   }
-  if(data){
-    popTitle.textContent=data.title||`خلية (${sq.ci},${sq.ri})`;
-    popBody.textContent=data.body||data.text||'';
-    popNodata.style.display='none';
-  } else {
-    popTitle.textContent=`خلية (${sq.ci},${sq.ri})`;
-    popBody.textContent='';
-    popNodata.style.display='block';
-  }
-  popOverlay.classList.add('open');
 }
 
-function closePopup(){
-  popOverlay.classList.remove('open');
-  popImg.src='';
-}
+function showInlinePopup(sq){
+  const num = cellToNum[`${sq.ci},${sq.ri}`];
+  
+  // ====== التعديل هنا: استخدام رابط السيرفر الخارجي للصور ======
+  const imgPath = `https://mazen-alhaddad.github.io/-/images/${num}.png`; 
+  
+  inlineImg.style.display = 'none';
+  inlineFall.style.display = 'none';
 
-/* ══════════════════════════════════════
-   IMPORT INFO JSON
-   Format: [{ci,ri,title,body,imgUrl}, ...]
-══════════════════════════════════════ */
-function handleImport(e){
-  const file=e.target.files[0]; if(!file) return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const arr=JSON.parse(ev.target.result);
-      if(!Array.isArray(arr)) throw new Error();
-      S.infoData={};
-      let n=0;
-      arr.forEach(item=>{
-        if(item.ci!==undefined && item.ri!==undefined){
-          S.infoData[`${item.ci},${item.ri}`]={
-            title:item.title||'',
-            body: item.body||item.text||item.description||'',
-            imgUrl:item.imgUrl||item.image||null
-          };
-          n++;
-        }
-      });
-      importSt.textContent=`✅ ${n} سجل تم تحميله`;
-      importSt.style.display='block';
-      toast(`✅ تم استيراد ${n} سجل`);
-    }catch{
-      importSt.textContent='❌ خطأ في تنسيق الملف';
-      importSt.style.display='block';
-      toast('❌ خطأ في قراءة الملف');
-    }
+  const tempImg = new Image();
+  tempImg.onload = () => {
+    inlineImg.src = imgPath;
+    inlineImg.style.display = 'block';
   };
-  reader.readAsText(file);
-  e.target.value='';
+  tempImg.onerror = () => {
+    inlineFall.innerHTML = `صورة<br>الرقم ${num}<br>غير متوفرة`;
+    inlineFall.style.display = 'flex';
+  };
+  tempImg.src = imgPath;
+
+  inlinePopup.style.display = 'block';
 }
 
 /* ══════════════════════════════════════
-   PINCH ZOOM — focal point stays fixed
-   between fingers (PDF-style smooth zoom)
+   PINCH ZOOM & PAN LOGIC
 ══════════════════════════════════════ */
-let pinch=null;
+let pinch=null, panSt=null;
 
 function onPinchStart(e){
   if(e.touches.length<2) return;
@@ -610,7 +530,7 @@ function onPinchStart(e){
     d:   Math.hypot(t0.clientX-t1.clientX, t0.clientY-t1.clientY),
     cx:  (t0.clientX+t1.clientX)/2,
     cy:  (t0.clientY+t1.clientY)/2,
-    sc0: T.scale,   // scale at pinch start
+    sc0: T.scale,
     tx0: T.tx, ty0: T.ty
   };
 }
@@ -623,24 +543,16 @@ function onPinchMove(e){
   const cx=(t0.clientX+t1.clientX)/2;
   const cy=(t0.clientY+t1.clientY)/2;
 
-  // Scale relative to START (avoids drift)
   const newSc=clamp(pinch.sc0*(d/pinch.d), fitSc, MAX_SC);
   const sf=newSc/pinch.sc0;
-  // Keep focal point (initial midpoint) fixed in screen space
   T.tx=pinch.cx - (pinch.cx-pinch.tx0)*sf + (cx-pinch.cx);
   T.ty=pinch.cy - (pinch.cy-pinch.ty0)*sf + (cy-pinch.cy);
   T.scale=newSc;
 
-  clampPan();
-  applyT();
-  showZoom();
+  clampPan(); applyT(); showZoom();
 }
-
 function onPinchEnd(){ pinch=null; }
 
-/* ══════════════════════════════════════
-   WHEEL ZOOM
-══════════════════════════════════════ */
 function onWheel(e){
   e.preventDefault();
   const rect=workspace.getBoundingClientRect();
@@ -652,19 +564,12 @@ function onWheel(e){
   T.tx=cx-(cx-T.tx)*sf;
   T.ty=cy-(cy-T.ty)*sf;
   T.scale=newSc;
-  clampPan();
-  applyT();
-  showZoom();
+  clampPan(); applyT(); showZoom();
 }
-
-/* ══════════════════════════════════════
-   PAN
-══════════════════════════════════════ */
-let panSt=null;
 
 function onPanStart(e){
   if(S.locked) return;
-  if(e.target.closest('.sq')) return;
+  if(e.target.closest('.sq') || e.target.closest('#menu-drawer')) return;
   if(e.touches && e.touches.length>=2) return;
   const p=getXY(e);
   panSt={px:p.x, py:p.y, tx:T.tx, ty:T.ty};
@@ -674,13 +579,12 @@ function onPanMove(e){
   const p=getXY(e);
   T.tx=panSt.tx+(p.x-panSt.px);
   T.ty=panSt.ty+(p.y-panSt.py);
-  clampPan();
-  applyT();
+  clampPan(); applyT();
 }
 function onPanEnd(){ panSt=null; }
 
 /* ══════════════════════════════════════
-   MENU
+   MENU & MISC
 ══════════════════════════════════════ */
 function toggleMenu(){
   const open=menuDrawer.classList.toggle('open');
@@ -691,9 +595,6 @@ function closeMenu(){
   menuBtn.classList.remove('open');
 }
 
-/* ══════════════════════════════════════
-   TOAST
-══════════════════════════════════════ */
 let toastTid;
 function toast(msg){
   let el=document.querySelector('.toast');
@@ -719,13 +620,11 @@ function clamp(v,lo,hi){return Math.max(lo,Math.min(v,hi));}
    BIND EVENTS
 ══════════════════════════════════════ */
 function bindEvents(){
-  // Menu toggle
   menuBtn.addEventListener('click',e=>{e.stopPropagation();toggleMenu();});
   document.addEventListener('click',e=>{
     if(!menuDrawer.contains(e.target)&&e.target!==menuBtn) closeMenu();
   });
 
-  // Cover / Reveal all
   btnReveal.addEventListener('click',()=>{
     S.squares.forEach(s=>s.revealed=true);
     renderSquares(); closeMenu();
@@ -734,23 +633,25 @@ function bindEvents(){
   btnCover.addEventListener('click',()=>{
     S.squares.forEach(s=>s.revealed=false);
     renderSquares(); closeMenu();
+    inlinePopup.style.display = 'none';
     toast('🫣 تم تغطية جميع المربعات');
   });
 
-  // Switches
   swLock.addEventListener('change',()=>{
     S.locked=swLock.checked;
     toast(S.locked?'🔒 تم قفل التحريك':'🔓 تم فتح التحريك');
   });
-  swPopup.addEventListener('change',()=>{
-    toast(swPopup.checked?'💬 نافذة المعلومات مفعّلة':'🔕 نافذة المعلومات معطّلة');
+  
+  swImgFeature.addEventListener('change',()=>{
+    toast(swImgFeature.checked?'تم تفعيل ميزة الصور':'تم إيقاف ميزة الصور');
+    if(!swImgFeature.checked) inlinePopup.style.display = 'none';
   });
 
-  // Import
-  btnImport.addEventListener('click',()=>importFile.click());
-  importFile.addEventListener('change',handleImport);
+  swPopup.addEventListener('change',()=>{
+    toast(swPopup.checked?'💬 نافذة المعلومات مفعّلة':'🔕 نافذة المعلومات معطّلة');
+    if(!swPopup.checked) inlinePopup.style.display = 'none';
+  });
 
-  // Background
   btnBg.addEventListener('click',()=>bgFile.click());
   bgFile.addEventListener('change',e=>{
     const file=e.target.files[0]; if(!file) return;
@@ -769,26 +670,17 @@ function bindEvents(){
     e.target.value='';
   });
 
-  // Rotation
   btnRotate.addEventListener('click',()=>{
     S.rotDeg=S.rotDeg===0?270:0;
     fitBoard(); renderSquares(); closeMenu();
     toast(S.rotDeg===270?'↻ تدوير 270°':'↺ اتجاه أصلي');
   });
 
-  // Reset zoom
   btnCenter.addEventListener('click',()=>{
     centerTransform(); showZoom(); closeMenu();
     toast('⊡ تم التوسيط');
   });
 
-  // Popup close
-  popClose.addEventListener('click',closePopup);
-  popOverlay.addEventListener('click',e=>{
-    if(e.target===popOverlay) closePopup();
-  });
-
-  // Touch: pinch zoom
   workspace.addEventListener('touchstart',e=>{
     if(e.touches.length>=2){ onPinchStart(e); }
     else{ onPanStart(e); }
@@ -803,30 +695,22 @@ function bindEvents(){
     onPanEnd();
   });
 
-  // Mouse pan
   workspace.addEventListener('mousedown',onPanStart);
   document.addEventListener('mousemove',onPanMove);
   document.addEventListener('mouseup',onPanEnd);
-
-  // Wheel zoom
   workspace.addEventListener('wheel',onWheel,{passive:false});
 }
 
 /* ══════════════════════════════════════
-   PWA — Service Worker
-══════════════════════════════════════ */
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js')
-      .then(r=>console.log('✅ SW registered:',r.scope))
-      .catch(e=>console.warn('SW failed:',e));
-  });
-}
-
-/* ══════════════════════════════════════
-   INIT
+   INIT & SERVICE WORKER REGISTRATION
 ══════════════════════════════════════ */
 window.addEventListener('load',()=>{
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.log('Service Worker Failed', err));
+  }
+
   fitBoard();
   renderSquares();
   bindEvents();
@@ -836,8 +720,5 @@ window.addEventListener('resize',()=>{
   renderSquares();
 });
 </script>
-</body>
-</html>
-t>
 </body>
 </html>
