@@ -782,13 +782,6 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('✅ تم تسجيل Service Worker بنجاح:', reg.scope))
       .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
   });
-}
-
-init();
-</script>
-</body>
-</html>
-;}
     else{
       const{x,y}=cellRect(drag.origCi,drag.origRi);
       drag.el.style.left=x+'px';drag.el.style.top=y+'px';
@@ -1142,6 +1135,12 @@ init();
         .catch(err => {
           console.log('ServiceWorker registration failed: ', err);
         });
+    });
+  }
+</script>
+</body>
+</html>
+;
     });
   }
 </script>
