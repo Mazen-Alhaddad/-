@@ -1,0 +1,22 @@
+{
+  "name": "لوحة المربعات المخصصة",
+  "short_name": "المربعات",
+  "description": "لوحة تفاعلية لوضع مربعات ملونة فوق صورة خلفية",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0c0c1a",
+  "theme_color": "#0c0c1a",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "utilities"],
+  "screenshots": []
+}
