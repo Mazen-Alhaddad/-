@@ -1,7 +1,7 @@
 {
   "name": "الجدول الدوري",
-  "short_name": "الجدول  الدوري",
-  "description": "لوحة تفاعلية لوضع مربعات ملونة فوق صورة خلفية",
+  "short_name": "الجدول الدوري",
+  "description": "تطبيق تفاعلي لحفظ عناصر الجدول الدوري",
   "start_url": ".",
   "display": "standalone",
   "orientation": "any",
@@ -21,6 +21,10 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ]
+}
+e"
     }
   ]
 }
