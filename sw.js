@@ -1,66 +1,70 @@
 /* ══════════════════════════════════════════
-   Squares Board — Service Worker v1
+   الجدول الدوري — Service Worker v2
+   يدعم العمل بدون إنترنت (Offline Mode)
 ══════════════════════════════════════════ */
-const CACHE = 'periodic-table-v2';
 
-const PRECACHE = [
+const CACHE_NAME = 'periodic-table-v2';
+
+// الملفات التي سيتم حفظها في ذاكرة الهاتف/الكمبيوتر فوراً
+const PRECACHE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.png',
-  'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap'
+  './icon.png'
 ];
 
-/* ── Install: pre-cache core assets ── */
-self.addEventListener('install', evt => {
-  evt.waitUntil(
-    caches.open(CACHE)
-      .then(cache => cache.addAll(PRECACHE))
+/* ── المرحلة 1: التثبيت (Install) ── */
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(PRECACHE_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
 
-/* ── Activate: clean old caches ── */
-self.addEventListener('activate', evt => {
-  evt.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE).map(k => caches.delete(k))
-      ))
-      .then(() => self.clients.claim())
+/* ── المرحلة 2: التفعيل (Activate) ── */
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.filter(name => name !== CACHE_NAME)
+                  .map(name => caches.delete(name))
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
-/* ── Fetch: cache-first, fallback to network ── */
-self.addEventListener('fetch', evt => {
-  // Skip non-GET and chrome-extension requests
-  if (evt.request.method !== 'GET') return;
-  if (evt.request.url.startsWith('chrome-extension://')) return;
+/* ── المرحلة 3: جلب البيانات (Fetch) ── */
+// هذا هو الجزء الذي سألت عنه، وهو المسؤول عن تشغيل التطبيق أوفلاين
+self.addEventListener('fetch', event => {
+  // تجاهل أي طلبات ليست من نوع GET (مثل طلبات الإضافة أو الحذف)
+  if (event.request.method !== 'GET') return;
 
-  evt.respondWith(
-    caches.match(evt.request).then(cached => {
-      if (cached) return cached;
+  event.respondWith(
+    caches.match(event.request).then(cachedResponse => {
+      // إذا كان الملف موجوداً في الذاكرة، استخرجه منها
+      if (cachedResponse) {
+        return cachedResponse;
+      }
 
-      return fetch(evt.request)
-        .then(response => {
-          // Cache successful responses (not opaque for cross-origin)
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE).then(cache => {
-              // Only cache same-origin and CORS-enabled responses
-              if (response.type === 'basic' || response.type === 'cors') {
-                cache.put(evt.request, clone);
-              }
-            });
-          }
+      // إذا لم يكن موجوداً، اطلبه من الإنترنت واحفظ نسخة منه للمرة القادمة
+      return fetch(event.request).then(response => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
-        })
-        .catch(() => {
-          // Offline fallback: serve index.html for navigation
-          if (evt.request.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
+        }
+
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
         });
+
+        return response;
+      }).catch(() => {
+        // إذا فشل الإنترنت تماماً، افتح الصفحة الرئيسية
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
     })
   );
 });
