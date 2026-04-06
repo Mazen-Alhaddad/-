@@ -2,7 +2,9 @@
   "name": "الجدول الدوري",
   "short_name": "الجدول الدوري",
   "description": "تطبيق تفاعلي لاستكشاف وعرض عناصر الجدول الدوري",
+  "id": "./",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0c0c1a",
@@ -14,13 +16,13 @@
       "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }

@@ -6,8 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0c0c1a">
-<link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
 <title>الجدول الدوري</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -500,33 +500,25 @@ function showInlinePopup(sq){
   inlineImg.style.display = 'none';
   inlineFall.style.display = 'none';
 
-  // ====== التعديل هنا: استخدام جزء من صورة الخلفية وتكبيره ======
   if (S.bgDataUrl) {
-    // 1. استخراج إحداثيات وأبعاد المربع الذي تم النقر عليه
     const rect = cellRect(sq.ci, sq.ri); 
     const bW = board.clientWidth;
     const bH = board.clientHeight;
     
-    // 2. حساب أبعاد النافذة المنبثقة تماماً كما تم حسابها في updatePopupSize
     const startCol = 4, endCol = 7;
     const startRow = 7, endRow = 10;
     const pW = vx(COL_XS[endCol] - COL_XS[startCol], bW);
     const pH = vy(ROW_YS[endRow] - ROW_YS[startRow], bH);
 
-    // 3. حساب نسبة التكبير اللازمة لملاءمة المربع داخل النافذة
     const scaleX = pW / rect.w;
     const scaleY = pH / rect.h;
 
-    // 4. تطبيق صورة الخلفية وخصائص التكبير والتموضع الدقيق
     inlineImg.style.backgroundImage = `url(${S.bgDataUrl})`;
-    // تكبير حجم الخلفية بما يتناسب مع نسبة التكبير المحسوبة
     inlineImg.style.backgroundSize = `${bW * scaleX}px ${bH * scaleY}px`;
-    // تحريك الخلفية باتجاه معاكس لإحداثيات المربع لإظهار ذلك الجزء بالتحديد
     inlineImg.style.backgroundPosition = `-${rect.x * scaleX}px -${rect.y * scaleY}px`;
     
     inlineImg.style.display = 'block';
   } else {
-    // في حال النقر ولم يتم تحميل صورة خلفية بعد
     inlineFall.innerHTML = `المربع ${num}<br>يُرجى تحميل صورة<br>خلفية أولاً للمعاينة`;
     inlineFall.style.display = 'flex';
   }
@@ -714,6 +706,33 @@ function bindEvents(){
 
   workspace.addEventListener('mousedown',onPanStart);
   document.addEventListener('mousemove',onPanMove);
+  document.addEventListener('mouseup',onPanEnd);
+  workspace.addEventListener('wheel',onWheel,{passive:false});
+}
+
+/* ══════════════════════════════════════
+   INIT & SERVICE WORKER REGISTRATION
+══════════════════════════════════════ */
+window.addEventListener('load', () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => console.log('Service Worker Registered with scope:', reg.scope))
+      .catch(err => console.log('Service Worker Failed:', err));
+  }
+
+  fitBoard();
+  renderSquares();
+  bindEvents();
+});
+
+window.addEventListener('resize',()=>{
+  fitBoard();
+  renderSquares();
+});
+</script>
+</body>
+</html>
+stener('mousemove',onPanMove);
   document.addEventListener('mouseup',onPanEnd);
   workspace.addEventListener('wheel',onWheel,{passive:false});
 }
